@@ -1,0 +1,1390 @@
+type: collection.insomnia.rest/5.0
+name: Estoque(WMS)
+meta:
+  id: wrk_24a7484902a84deb9de98ef260bd9e53
+  created: 1737935333467
+  modified: 1737935333467
+collection:
+  - name: User
+    meta:
+      id: fld_9c38a5130e4e4e78acf0a26fd4db0d79
+      created: 1738189794340
+      modified: 1738189794340
+      sortKey: -1738189794340
+    children:
+      - url: http://localhost:3000/users
+        name: Create User
+        meta:
+          id: req_1a715aa5fd694a09af2fcafd8d7c09e2
+          created: 1737935341154
+          modified: 1741914403502
+          isPrivate: false
+          sortKey: -1738189803003
+        method: POST
+        body:
+          mimeType: application/json
+          text: |+
+            {
+            	"first_name": "Eduardo",
+              "last_name": "Pedro",
+              "email": "edu@gmail.com",
+            	"password": "12345", 
+              "username": "edu.p",
+              "role": "admin",
+            	"active": true,
+              "isBlocked":false,
+              "login_attempts": 1	
+            }
+
+
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/users
+        name: List
+        meta:
+          id: req_a29e8514fe4b4e98b02446db91f58724
+          created: 1738192369248
+          modified: 1738192374118
+          isPrivate: false
+          sortKey: -1736852565067.5
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/users/14bd7c29-de55-4c87-9ae1-fd230874237a
+        name: Update
+        meta:
+          id: req_878b34f7bfde40f59ec9de3828f953d0
+          created: 1738276320098
+          modified: 1741554552030
+          isPrivate: false
+          sortKey: -1737521184035.25
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"permission_id": [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],
+            	"companyId": [2,34]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/users/a67fe80e-c19c-4779-a40c-77f3ea5c524e
+        name: delete
+        meta:
+          id: req_a6d1cca6ec5847da8761b9dfff395549
+          created: 1738276527197
+          modified: 1738276580415
+          isPrivate: false
+          sortKey: -1737186874551.375
+        method: DELETE
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/users/14bd7c29-de55-4c87-9ae1-fd230874237a
+        name: listId
+        meta:
+          id: req_1c29d482f873422cb4755ca1ad118dff
+          created: 1738277096259
+          modified: 1740925221536
+          isPrivate: false
+          sortKey: -1737019719809.4375
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Permissão
+    meta:
+      id: fld_2d91fb797ffd4edd915f65a74097fa93
+      created: 1738797910926
+      modified: 1738797910926
+      sortKey: -1736852530721
+    children:
+      - url: http://localhost:3000/permissions
+        name: Create Permissão
+        meta:
+          id: req_ac76a0fe0e3949cbb3d10e4c5d7c4553
+          created: 1738797910929
+          modified: 1741914450356
+          isPrivate: false
+          sortKey: -1738189803003
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"name": "address_blocked",
+              "description": "Permite bloquear endereço",
+            	"create_id": "4bcc2b22-dc5a-441f-869a-3f5c5e2db079"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/permissions
+        name: List
+        meta:
+          id: req_3f7879f2f9bd423b8a652d3bbc1c3027
+          created: 1738797910931
+          modified: 1738802222073
+          isPrivate: false
+          sortKey: -1736852565067.5
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/permissions/5
+        name: Update
+        meta:
+          id: req_d0b794984d5c44459fd58110f645d18d
+          created: 1738797910934
+          modified: 1739745376850
+          isPrivate: false
+          sortKey: -1737521184035.25
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"name": "permission_update",
+              "description": "Permite atualizar permissão!"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/permissions/a67fe80e-c19c-4779-a40c-77f3ea5c524e
+        name: delete
+        meta:
+          id: req_4a51e989e7334097b151cd01d3c5b433
+          created: 1738797910938
+          modified: 1738798473476
+          isPrivate: false
+          sortKey: -1737186874551.375
+        method: DELETE
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/permissions/2
+        name: listId
+        meta:
+          id: req_af257f26f4164e13aee49ce8e466a6de
+          created: 1738797910941
+          modified: 1739745217588
+          isPrivate: false
+          sortKey: -1737019719809.4375
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Login
+    meta:
+      id: fld_02068b98d68f42d2a4bf87e120c620bd
+      created: 1738801334515
+      modified: 1738801334515
+      sortKey: -1738801334515
+    children:
+      - url: "{{ _.URLApi }}/auth/login"
+        name: Login
+        meta:
+          id: req_68000af5925147efb98b006292e39e75
+          created: 1738801481657
+          modified: 1741914416178
+          isPrivate: false
+          sortKey: -1738801481657
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"username" :"edu.p",
+            	"password" :"12345"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Empresa
+    meta:
+      id: fld_50484ea8e06a4708a4c1da26b67b1ef6
+      created: 1738890643246
+      modified: 1738890643245
+      sortKey: -1736183898911.5
+    children:
+      - url: http://localhost:3000/company
+        name: Create Empresa
+        meta:
+          id: req_4834477d0d724918919a0cc54c86d77d
+          created: 1738890643249
+          modified: 1741914510839
+          isPrivate: false
+          sortKey: -1738189803003
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"name": "IBL",
+              "cnpj": "62718322000128",
+            	"create_id": "4bcc2b22-dc5a-441f-869a-3f5c5e2db079"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/company
+        name: List
+        meta:
+          id: req_d28bf99c8fe542c8a821e8dd3d6fd053
+          created: 1738890643254
+          modified: 1738890933740
+          isPrivate: false
+          sortKey: -1736852565067.5
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/company/1
+        name: Update
+        meta:
+          id: req_a5b229eb3eee43f89d8b90174e0fc487
+          created: 1738890643258
+          modified: 1738890888075
+          isPrivate: false
+          sortKey: -1737521184035.25
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"name": "TELEFONICA"  
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/company/1
+        name: delete
+        meta:
+          id: req_04acfe7a6251469e94b1570dd4c3bed8
+          created: 1738890643262
+          modified: 1738890972906
+          isPrivate: false
+          sortKey: -1737186874551.375
+        method: DELETE
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/company/1
+        name: listId
+        meta:
+          id: req_14e03557c33c4cbfae2ad68dd38e9590
+          created: 1738890643264
+          modified: 1738890922717
+          isPrivate: false
+          sortKey: -1737019719809.4375
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/company/blocked/1
+        name: Blocked
+        meta:
+          id: req_ce070302d6fd4a04ae48cb9be0a43156
+          created: 1739747125341
+          modified: 1742048836501
+          isPrivate: false
+          sortKey: -1737354029293.3125
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"isBlocked": false
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Item
+    meta:
+      id: fld_ce55c59a6684464baf0a0508a86fffcf
+      created: 1739744823924
+      modified: 1739744823924
+      sortKey: -1735849583006.75
+    children:
+      - url: http://localhost:3000/items
+        name: Create Código
+        meta:
+          id: req_e66265e97eca4f5c9e350ede848ee032
+          created: 1739744823926
+          modified: 1742081372788
+          isPrivate: false
+          sortKey: -1738189803003
+        method: POST
+        body:
+          mimeType: application/json
+          text: |+
+            {
+            	"code": "0192-0017-7",
+              "description": "MODEN WIFI 5",
+            	"weight": 100,
+            	"companyId": 1,
+            	"categoryId": 1
+            }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/items
+        name: List
+        meta:
+          id: req_6db681d3fc4d4416ada21fd4709dac95
+          created: 1739744823929
+          modified: 1739745856816
+          isPrivate: false
+          sortKey: -1736852565067.5
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/items/2
+        name: Update
+        meta:
+          id: req_ad0a4e85fb2443ed9b07d17cc614bb11
+          created: 1739744823931
+          modified: 1739746231506
+          isPrivate: false
+          sortKey: -1737521184035.25
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"description": "MODEN WIFI 7"  
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/items/1
+        name: delete
+        meta:
+          id: req_de629872642c48c596bdc0b6782b684a
+          created: 1739744823933
+          modified: 1739746199600
+          isPrivate: false
+          sortKey: -1737186874551.375
+        method: DELETE
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/items/9
+        name: listId
+        meta:
+          id: req_08d22c83854f4116aee2325e2ea7285e
+          created: 1739744823935
+          modified: 1741447182594
+          isPrivate: false
+          sortKey: -1737019719809.4375
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/items/blocked/1
+        name: blocked
+        meta:
+          id: req_a61f65cecb9e4632a63d3e2dc4f143eb
+          created: 1739745990878
+          modified: 1739746185295
+          isPrivate: false
+          sortKey: -1736936142438.4688
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |+
+            {
+            	"isBlocked": false 
+            }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Categoria
+    meta:
+      id: fld_7b934e111b394e40abbcfc3d49c66a43
+      created: 1741390142352
+      modified: 1741913492650
+      sortKey: -1736016740959.125
+    children:
+      - url: http://localhost:3000/category
+        name: Create Código
+        meta:
+          id: req_66d6bec671ff46a2a7e52cab755453ff
+          created: 1741390142355
+          modified: 1741913498665
+          isPrivate: false
+          sortKey: -1738189803003
+        method: POST
+        body:
+          mimeType: application/json
+          text: |+
+            {
+            	"name": "MOVEL",
+            	"companyId": 1
+            }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/category
+        name: List
+        meta:
+          id: req_a4a1cbdc39664bf88a52d0c8e2484d9a
+          created: 1741390142358
+          modified: 1741444745679
+          isPrivate: false
+          sortKey: -1736852565067.5
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/category/1
+        name: Update
+        meta:
+          id: req_507a7300a45549c0a1145d0a85d013e7
+          created: 1741390142360
+          modified: 1741445241650
+          isPrivate: false
+          sortKey: -1737521184035.25
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"name": "FIXA",
+            	"companyId": 2
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/category/1
+        name: delete
+        meta:
+          id: req_9900313d27854458957b7d578d3e4d55
+          created: 1741390142364
+          modified: 1741445339088
+          isPrivate: false
+          sortKey: -1737186874551.375
+        method: DELETE
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/category/1
+        name: listId
+        meta:
+          id: req_4163227905b942d78941e9f5adfa65bf
+          created: 1741390142366
+          modified: 1741445183000
+          isPrivate: false
+          sortKey: -1737019719809.4375
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Endereço
+    meta:
+      id: fld_04ad411838404ef7ba6b1d6638205032
+      created: 1741553460133
+      modified: 1741553460133
+      sortKey: -1735598846078.1875
+    children:
+      - url: http://localhost:3000/address
+        name: Create Endereço
+        meta:
+          id: req_01768059a0244d7c9b2f9f73ff085731
+          created: 1741553460142
+          modified: 1741914550336
+          isPrivate: false
+          sortKey: -1738189803003
+        method: POST
+        body:
+          mimeType: application/json
+          text: |+
+            {
+            	"name": "DOCA 1",
+            	"capacity": 800,
+            	"companyId": 1
+            }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/address
+        name: List
+        meta:
+          id: req_8334a95c29524481978b6b04c3582675
+          created: 1741553460147
+          modified: 1741553755193
+          isPrivate: false
+          sortKey: -1736852565067.5
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/address/1
+        name: Update
+        meta:
+          id: req_bc6f8b7e226b41fe9dbba10d6cc2b8f7
+          created: 1741553460151
+          modified: 1741554265613
+          isPrivate: false
+          sortKey: -1737521184035.25
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"capacity": 400
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/category/1
+        name: delete
+        meta:
+          id: req_6f5ccdbd120947538d1097609e761b20
+          created: 1741553460157
+          modified: 1741553460157
+          isPrivate: false
+          sortKey: -1737186874551.375
+        method: DELETE
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/address/1
+        name: listId
+        meta:
+          id: req_9a79c76dd7764933a22bc7e2c886f0ab
+          created: 1741553460165
+          modified: 1741554563853
+          isPrivate: false
+          sortKey: -1737019719809.4375
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/address/blocked/1
+        name: blocked
+        meta:
+          id: req_ce9cfd5e7ac6412e81c088ec2f977671
+          created: 1741554484972
+          modified: 1741554518854
+          isPrivate: false
+          sortKey: -1737437606664.2812
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"isBlocked": true
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Tipo Estoque
+    meta:
+      id: fld_b07d1dec3dd24baab00bf4abafe8d7e5
+      created: 1742038827886
+      modified: 1742038827886
+      sortKey: -1735557056590.0938
+    children:
+      - url: http://localhost:3000/stock-type
+        name: Create Endereço
+        meta:
+          id: req_bc77cac8e83c4447bc25f7e388aad4c6
+          created: 1742038827889
+          modified: 1742039136677
+          isPrivate: false
+          sortKey: -1738189803003
+        method: POST
+        body:
+          mimeType: application/json
+          text: |+
+            {
+            	"name": "SUCATA",
+            	"companyId": 1
+            }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/stock-type
+        name: List
+        meta:
+          id: req_ffdc08fbce2142088552ac817fb47e61
+          created: 1742038827891
+          modified: 1742038986818
+          isPrivate: false
+          sortKey: -1736852565067.5
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/stock-type/2
+        name: Update
+        meta:
+          id: req_028ab24c2fdf46ce95fef6466adcc928
+          created: 1742038827894
+          modified: 1742048785796
+          isPrivate: false
+          sortKey: -1737521184035.25
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"name": "ESTOQUE LIVRE"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/stock-type/1
+        name: delete
+        meta:
+          id: req_02e3ac65ccf544049dd821ac5d41aef5
+          created: 1742038827897
+          modified: 1742048620369
+          isPrivate: false
+          sortKey: -1737186874551.375
+        method: DELETE
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/stock-type/1
+        name: listId
+        meta:
+          id: req_f4833089fdb74b7ea874966ec92bdbc1
+          created: 1742038827901
+          modified: 1742048602460
+          isPrivate: false
+          sortKey: -1737019719809.4375
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Nota fiscal
+    meta:
+      id: fld_b37d01f72037400ba094888a62e54fbd
+      created: 1742053365730
+      modified: 1742053365730
+      sortKey: -1735536161846.0469
+    children:
+      - url: http://localhost:3000/invoice
+        name: Create Endereço
+        meta:
+          id: req_9f178386f50e493580dd9890ce3a694f
+          created: 1742053365732
+          modified: 1742252361128
+          isPrivate: false
+          sortKey: -1738189803003
+        method: POST
+        body:
+          mimeType: application/json
+          text: |+
+            {
+            	"number": "12425889877",
+            	"series":  "1",
+            	"issueDate": "2025-03-14",
+            	"entryDate": "2025-03-14",
+            	"totalNfValue": 1784,
+            	"companyId": 1,
+            	"divergenceReason": "Sobra no recebimento",
+            	"divergence": true,
+            	"items":[
+            			{
+            				"itemId": 1,
+            				"invoiceQuantity": 30,
+            				"unitPrice": 5,
+            				"stockTypeId": 2,
+            				"addressId": 1,
+            				"divergenceQuantity": 31
+            		},
+            		{
+            				"itemId": 2,
+            				"invoiceQuantity": 60,			
+            				"unitPrice": 5,
+            				"stockTypeId": 3,
+            				"addressId": 1
+            			
+            		}
+            	]
+            }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/invoice
+        name: List
+        meta:
+          id: req_ebb142deca124573ae418837337b2de3
+          created: 1742053365733
+          modified: 1742161531109
+          isPrivate: false
+          sortKey: -1736852565067.5
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/stock-type/2
+        name: Update
+        meta:
+          id: req_a41a3169052f459a8bb97979cddb4e29
+          created: 1742053365735
+          modified: 1742053365735
+          isPrivate: false
+          sortKey: -1737521184035.25
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"name": "ESTOQUE LIVRE"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/invoice/23
+        name: delete
+        meta:
+          id: req_f7ace1b6df3e45e99b824d9ce28462e1
+          created: 1742053365737
+          modified: 1742253251773
+          isPrivate: false
+          sortKey: -1737186874551.375
+        method: DELETE
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:3000/invoice/23
+        name: listId
+        meta:
+          id: req_62b5483fd9d745b9902e77356d8c3663
+          created: 1742053365739
+          modified: 1742169081579
+          isPrivate: false
+          sortKey: -1737019719809.4375
+        method: GET
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        authentication:
+          type: bearer
+          token: "{{ _.toker }}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_2b00c530daa305c631d711ee11f1ddd9bf61b39e
+    created: 1737935333484
+    modified: 1737935333484
+environments:
+  name: Base Environment
+  meta:
+    id: env_2b00c530daa305c631d711ee11f1ddd9bf61b39e
+    created: 1737935333470
+    modified: 1741914427542
+    isPrivate: false
+  data:
+    URLApi: http://localhost:3000
+    toker: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjRiY2MyYjIyLWRjNWEtNDQxZi04NjlhLTNmNWM1ZTJkYjA3OSIsImZpcnN0X25hbWUiOiJFZHVhcmRvIiwibGFzdF9uYW1lIjoiUGVkcm8iLCJlbWFpbCI6ImVkdUBnbWFpbC5jb20iLCJ1c2VybmFtZSI6ImVkdS5wIiwicm9sZSI6ImFkbWluIiwiaXNCbG9ja2VkIjpmYWxzZSwiYWN0aXZlIjp0cnVlLCJpYXQiOjE3NDE5MTQ0MTcsImV4cCI6MTc0NDUwNjQxN30.lvwQgVc2hj496tpc1WtfQpb9jBbaeM796AVecFCn3Og
