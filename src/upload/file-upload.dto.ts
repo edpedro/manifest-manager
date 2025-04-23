@@ -9,7 +9,7 @@ export class UploadDto {
   readonly mimetype: string;
   readonly buffer: Buffer;
   readonly size: number;
-  readonly company_id: string;
+  readonly user_id: string;
 }
 
 export const multerOptions: MulterOptions = {
@@ -48,5 +48,5 @@ export class UploadPDFDto {
   readonly mimetype: string;
   readonly buffer: Buffer;
   readonly size: number;
-  readonly company_id: string;
+  readonly user_id: string;
 }

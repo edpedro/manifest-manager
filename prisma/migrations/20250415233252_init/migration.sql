@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "shipment" ALTER COLUMN "name" DROP NOT NULL,
+ALTER COLUMN "transport" DROP NOT NULL,
+ALTER COLUMN "cpf" DROP NOT NULL,
+ALTER COLUMN "dispatch_date" DROP NOT NULL,
+ALTER COLUMN "dispatch_time" DROP NOT NULL;

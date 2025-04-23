@@ -18,8 +18,53 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
+  shipment Shipment[]
+  history History[]
 
   
   @@map("users")
 }
 
+model Shipment {
+  id                  Int       @id @default(autoincrement())
+  st                  String
+  supply              String
+  invoice_number      String
+  invoice_issue_date  DateTime
+  destination         String
+  carrier             String
+  transport_mode      String
+  category            String
+  Valeu_invoice       Decimal
+  name                String?
+  transport           String?
+  cpf                 String?
+  dispatch_date       DateTime?
+  dispatch_time       String?
+  status              String? @default("Pendente")
+  observation         String?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  user_id      String
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  history History[]
+
+ 
+  @@index([st, supply, invoice_number])
+  @@map("shipment")
+}
+
+model History {
+  user_id      String     
+  shipment_id Int  
+  action String
+  assigned_at  DateTime @default(now()) @map("assigned_at")
+
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shipment Shipment @relation(fields: [shipment_id], references: [id], onDelete: Cascade)
+
+   @@id([user_id, shipment_id])
+   @@map("history")
+}
