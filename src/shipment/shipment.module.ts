@@ -17,6 +17,10 @@ import { UpdateShipmentDto } from './dto/update-shipment.dto';
 import { SearchStUseCase } from './usecases/st-search-shipment.usecase';
 import { SearchInvoiceUseCase } from './usecases/invoice-search-shipment.usecase';
 import { SearchSupplyUseCase } from './usecases/supply-search-shipment.usecase';
+import { DateFindAllUseCase } from './usecases/date-all-shipment.usecase';
+import { ListAllStShipmentUseCase } from './usecases/list-allSt-shipment.usecase';
+import { ListBySupplysShipmentUseCase } from './usecases/list-bySupplys-shipment.usecase';
+import { UpdateExpeditionShipmentUseCase } from './usecases/update-expedition-shipment.usecase';
 
 @Module({
   controllers: [ShipmentController],
@@ -37,6 +41,10 @@ import { SearchSupplyUseCase } from './usecases/supply-search-shipment.usecase';
     SearchStUseCase,
     SearchInvoiceUseCase,
     SearchSupplyUseCase,
+    DateFindAllUseCase,
+    ListAllStShipmentUseCase,
+    ListBySupplysShipmentUseCase,
+    UpdateExpeditionShipmentUseCase,
   ],
 })
 export class ShipmentModule {}

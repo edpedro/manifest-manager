@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Res,
 } from '@nestjs/common';
 import { ShipmentService } from '../service/shipment.service';
 import { UpdateShipmentDto } from '../dto/update-shipment.dto';
@@ -17,6 +18,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions, UploadDto } from 'src/upload/file-upload.dto';
 import { ReqUserDto } from 'src/auth/dto/req-user.dto';
+import { DateShipmentDto } from '../dto/date-shipment.dto';
+import { Response } from 'express';
 
 @Controller('shipment')
 @UseGuards(AuthGuard('jwt'))
@@ -27,6 +30,42 @@ export class ShipmentController {
   @UseInterceptors(FileInterceptor('file', multerOptions))
   uploadExcel(@UploadedFile() file: UploadDto, @Req() req: ReqUserDto) {
     return this.shipmentService.create(file, req);
+  }
+
+  @Post('/expedition')
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  uploadExpeditionExcel(
+    @UploadedFile() file: UploadDto,
+    @Req() req: ReqUserDto,
+  ) {
+    return this.shipmentService.ExpeditionExcel(file, req);
+  }
+
+  @Post('/date/export')
+  exportDateExcel(
+    @Body() data: DateShipmentDto,
+    @Req() req: ReqUserDto,
+    @Res() res: Response,
+  ) {
+    return this.shipmentService.exportDateExcel(data, req, res);
+  }
+
+  @Post('/st/export')
+  exportStExcel(
+    @Body() st: string[],
+    @Req() req: ReqUserDto,
+    @Res() res: Response,
+  ) {
+    return this.shipmentService.exportStExcel(st, req, res);
+  }
+
+  @Post('/supply/export')
+  exportSupplyExcel(
+    @Body() supply: string[],
+    @Req() req: ReqUserDto,
+    @Res() res: Response,
+  ) {
+    return this.shipmentService.exportSupplyExcel(supply, req, res);
   }
 
   @Get()

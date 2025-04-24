@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateShipmentDto } from '../dto/create-shipment.dto';
 import { UpdateShipmentDto } from '../dto/update-shipment.dto';
 import { ShipmentDto } from '../dto/shipment.dto';
+import { DateShipmentDto } from '../dto/date-shipment.dto';
 
 @Injectable()
 export class ShipmentRepository {
@@ -478,5 +479,205 @@ export class ShipmentRepository {
         ? shipment.dispatch_date.toISOString()
         : null,
     }));
+  }
+
+  async findDateShipment(
+    date_start: string,
+    date_end: string,
+  ): Promise<ShipmentDto[]> {
+    const shipments = await this.prisma.shipment.findMany({
+      where: {
+        invoice_issue_date: {
+          gte: date_start, // data inicial
+          lte: date_end, // data final
+        },
+      },
+      orderBy: {
+        st: 'asc', // ou 'desc' para decrescente
+      },
+      select: {
+        id: true,
+        st: true,
+        supply: true,
+        invoice_number: true,
+        invoice_issue_date: true,
+        destination: true,
+        carrier: true,
+        transport_mode: true,
+        Valeu_invoice: true,
+        category: true,
+        name: true,
+        transport: true,
+        cpf: true,
+        dispatch_date: true,
+        dispatch_time: true,
+        status: true,
+        observation: true,
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+          },
+        },
+      },
+    });
+
+    return shipments.map((shipment) => ({
+      ...shipment,
+      name: shipment.user?.first_name ?? null,
+      Valeu_invoice:
+        shipment.Valeu_invoice !== null ? Number(shipment.Valeu_invoice) : null,
+      dispatch_date: shipment.dispatch_date
+        ? shipment.dispatch_date.toISOString()
+        : null,
+    }));
+  }
+
+  async sTsAllShipment(data: string[]): Promise<any> {
+    return await this.prisma.shipment.findMany({
+      where: {
+        st: {
+          in: data,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            first_name: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findBySupply(supply: string): Promise<ShipmentDto | null> {
+    const shipment = await this.prisma.shipment.findFirst({
+      where: {
+        supply,
+      },
+      select: {
+        id: true,
+        st: true,
+        supply: true,
+        invoice_number: true,
+        invoice_issue_date: true,
+        destination: true,
+        carrier: true,
+        transport_mode: true,
+        Valeu_invoice: true,
+        category: true,
+        name: true,
+        transport: true,
+        cpf: true,
+        dispatch_date: true,
+        dispatch_time: true,
+        status: true,
+        observation: true,
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+          },
+        },
+      },
+    });
+
+    if (!shipment) return null;
+
+    return {
+      id: shipment.id,
+      st: shipment.st,
+      supply: shipment.supply,
+      invoice_number: shipment.invoice_number,
+      invoice_issue_date: shipment.invoice_issue_date,
+      destination: shipment.destination,
+      carrier: shipment.carrier,
+      transport_mode: shipment.transport_mode,
+      Valeu_invoice: shipment.Valeu_invoice
+        ? shipment.Valeu_invoice.toNumber()
+        : null,
+      name: shipment.user?.first_name ?? null,
+      transport: shipment.transport ?? null,
+      cpf: shipment.cpf ?? null,
+      dispatch_date: shipment.dispatch_date
+        ? shipment.dispatch_date.toISOString()
+        : null,
+      dispatch_time: shipment.dispatch_time ?? null,
+      status: shipment.status ?? null,
+      observation: shipment.observation ?? null,
+      category: shipment.category,
+      user: {
+        id: shipment.user.id,
+        first_name: shipment.user.first_name,
+      },
+    };
+  }
+
+  async updateExpedition(
+    id: number,
+    data: UpdateShipmentDto,
+    userId: string,
+  ): Promise<ShipmentDto | null> {
+    const updateShipment = await this.prisma.shipment.update({
+      where: {
+        id,
+      },
+      data,
+      select: {
+        id: true,
+        st: true,
+        supply: true,
+        invoice_number: true,
+        invoice_issue_date: true,
+        destination: true,
+        carrier: true,
+        transport_mode: true,
+        Valeu_invoice: true,
+        category: true,
+        name: true,
+        transport: true,
+        cpf: true,
+        dispatch_date: true,
+        dispatch_time: true,
+        status: true,
+        observation: true,
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+          },
+        },
+      },
+    });
+
+    if (!updateShipment) return null;
+
+    return {
+      id: updateShipment.id,
+      st: updateShipment.st,
+      supply: updateShipment.supply,
+      invoice_number: updateShipment.invoice_number,
+      invoice_issue_date: updateShipment.invoice_issue_date,
+      destination: updateShipment.destination,
+      carrier: updateShipment.carrier,
+      transport_mode: updateShipment.transport_mode,
+      Valeu_invoice: updateShipment.Valeu_invoice
+        ? updateShipment.Valeu_invoice.toNumber()
+        : null,
+      name: updateShipment.user?.first_name ?? null,
+      transport: updateShipment.transport ?? null,
+      cpf: updateShipment.cpf ?? null,
+      dispatch_date: updateShipment.dispatch_date
+        ? updateShipment.dispatch_date.toISOString()
+        : null,
+      dispatch_time: updateShipment.dispatch_time ?? null,
+      status: updateShipment.status ?? null,
+      observation: updateShipment.observation ?? null,
+      category: updateShipment.category,
+      user: {
+        id: updateShipment.user.id,
+        first_name: updateShipment.user.first_name,
+      },
+    };
   }
 }

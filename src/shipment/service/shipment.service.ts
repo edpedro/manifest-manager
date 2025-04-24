@@ -1,5 +1,5 @@
 import { CreateShipmentUseCase } from './../usecases/create-shipment.usecase';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
 import { UpdateShipmentDto } from '../dto/update-shipment.dto';
 import { UploadDto } from 'src/upload/file-upload.dto';
 import { ReqUserDto } from 'src/auth/dto/req-user.dto';
@@ -17,6 +17,16 @@ import { SearchStUseCase } from '../usecases/st-search-shipment.usecase';
 import { ShipmentDto } from '../dto/shipment.dto';
 import { SearchInvoiceUseCase } from '../usecases/invoice-search-shipment.usecase';
 import { SearchSupplyUseCase } from '../usecases/supply-search-shipment.usecase';
+import { DateShipmentDto } from '../dto/date-shipment.dto';
+import { DateFindAllUseCase } from '../usecases/date-all-shipment.usecase';
+import { renameExpedicaoFields } from '../utils/renameExpedicaoFields';
+import * as XLSX from 'xlsx';
+import { join } from 'path';
+import { Response } from 'express';
+import { ListAllStShipmentUseCase } from '../usecases/list-allSt-shipment.usecase';
+import { expeditionExcelManager } from '../utils/expeditionExcelManager';
+import { ListBySupplysShipmentUseCase } from '../usecases/list-bySupplys-shipment.usecase';
+import { UpdateExpeditionShipmentUseCase } from '../usecases/update-expedition-shipment.usecase';
 
 @Injectable()
 export class ShipmentService {
@@ -33,6 +43,10 @@ export class ShipmentService {
     private readonly searchStUseCase: SearchStUseCase,
     private readonly searchInvoiceUseCase: SearchInvoiceUseCase,
     private readonly searchSupplyUseCase: SearchSupplyUseCase,
+    private readonly dateFindAllUseCase: DateFindAllUseCase,
+    private readonly listAllStShipmentUseCase: ListAllStShipmentUseCase,
+    private readonly listBySupplysShipmentUseCase: ListBySupplysShipmentUseCase,
+    private readonly updateExpeditionShipmentUseCase: UpdateExpeditionShipmentUseCase,
   ) {}
   async create(file: UploadDto, req: ReqUserDto) {
     const dataExcel = await createExcelManager(file, req.user.id);
@@ -195,6 +209,142 @@ export class ShipmentService {
     } catch (error) {
       console.log(error);
       throw new HttpException('Dados não deletado', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async exportDateExcel(
+    data: DateShipmentDto,
+    req: ReqUserDto,
+    @Res() res: Response,
+  ) {
+    const date_start = converterDataParaISOComFuso(data.data_start);
+    const date_end = converterDataParaISOComFuso(data.date_end, true);
+
+    function converterDataParaISOComFuso(
+      dataString: string,
+      finalDoDia = false,
+    ): string {
+      const data = new Date(dataString);
+
+      if (finalDoDia) {
+        // Ajusta para 03:00:00 do dia seguinte para garantir que inclui até esse horário
+        data.setDate(data.getDate() + 1);
+        data.setHours(3, 0, 0, 0);
+      } else {
+        data.setHours(3, 0, 0, 0);
+      }
+
+      return data.toISOString();
+    }
+
+    const result = await this.dateFindAllUseCase.execute(date_start, date_end);
+
+    const renamedResults = await renameExpedicaoFields(result);
+
+    const ws = XLSX.utils.json_to_sheet(renamedResults);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    XLSX.writeFile(wb, 'lista.xlsx');
+
+    const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
+    res.download(file, `lista_${date_start}-${date_end}.xlsx`);
+
+    return result;
+  }
+
+  async exportStExcel(st: string[], req: ReqUserDto, @Res() res: Response) {
+    const stExist = await this.listAllStShipmentUseCase.execute(st);
+
+    if (!stExist) {
+      throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
+    }
+
+    const renamedResults = await renameExpedicaoFields(stExist);
+
+    const numbers = Array.from({ length: 3 }, () =>
+      Math.floor(Math.random() * 101),
+    );
+
+    const ws = XLSX.utils.json_to_sheet(renamedResults);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    XLSX.writeFile(wb, 'lista.xlsx');
+
+    const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
+    res.download(file, `lista_STs${numbers}.xlsx`);
+
+    return stExist;
+  }
+
+  async exportSupplyExcel(
+    supply: string[],
+    req: ReqUserDto,
+    @Res() res: Response,
+  ) {
+    const supplyExist =
+      await this.listAllSupplysShipmentUseCase.execute(supply);
+
+    if (!supplyExist) {
+      throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
+    }
+
+    const renamedResults = await renameExpedicaoFields(supplyExist);
+
+    const numbers = Array.from({ length: 3 }, () =>
+      Math.floor(Math.random() * 101),
+    );
+
+    const ws = XLSX.utils.json_to_sheet(renamedResults);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    XLSX.writeFile(wb, 'lista.xlsx');
+
+    const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
+    res.download(file, `lista_supplys${numbers}.xlsx`);
+
+    return supplyExist;
+  }
+
+  async ExpeditionExcel(file: UploadDto, req: ReqUserDto) {
+    try {
+      const dataExcel = await expeditionExcelManager(file, req.user.id);
+
+      const updatedSupplies: ShipmentDto[] = [];
+
+      for (const item of dataExcel) {
+        const existing = await this.listBySupplysShipmentUseCase.execute(
+          item.supply,
+        );
+
+        if (existing) {
+          const updateData: UpdateShipmentDto = {
+            name: item.name,
+            transport: item.transport,
+            cpf: item.cpf,
+            dispatch_date: item.dispatch_date,
+            dispatch_time: item.dispatch_time,
+            status: 'Expedido',
+          };
+
+          const update = await this.updateExpeditionShipmentUseCase.execute(
+            existing.id,
+            updateData,
+            req.user.id,
+          );
+          updatedSupplies.push(update);
+        }
+      }
+
+      return updatedSupplies;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Dados não cadastrados', HttpStatus.BAD_REQUEST);
     }
   }
 }
