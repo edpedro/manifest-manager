@@ -22,7 +22,7 @@ import { DateShipmentDto } from '../dto/date-shipment.dto';
 import { Response } from 'express';
 
 @Controller('shipment')
-//@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 export class ShipmentController {
   constructor(private readonly shipmentService: ShipmentService) {}
 
