@@ -27,6 +27,7 @@ import { ListAllStShipmentUseCase } from '../usecases/list-allSt-shipment.usecas
 import { expeditionExcelManager } from '../utils/expeditionExcelManager';
 import { ListBySupplysShipmentUseCase } from '../usecases/list-bySupplys-shipment.usecase';
 import { UpdateExpeditionShipmentUseCase } from '../usecases/update-expedition-shipment.usecase';
+import { SearchDto } from '../dto/search';
 
 @Injectable()
 export class ShipmentService {
@@ -98,30 +99,16 @@ export class ShipmentService {
     return data;
   }
 
-  async search(searchData: UpdateShipmentDto, req: ReqUserDto) {
-    const data: ShipmentDto[] = [];
+  async search(search: SearchDto) {
+    const promises: Promise<ShipmentDto[]>[] = [];
 
-    if (searchData.st) {
-      const stExist = await this.searchStUseCase.execute(searchData.st);
+    promises.push(this.searchStUseCase.execute(search.searchData));
+    promises.push(this.searchInvoiceUseCase.execute(search.searchData));
+    promises.push(this.searchSupplyUseCase.execute(search.searchData));
 
-      data.push(...stExist);
-    }
+    const results = await Promise.all(promises);
 
-    if (searchData.invoice_number) {
-      const invoiceExist = await this.searchInvoiceUseCase.execute(
-        searchData.invoice_number,
-      );
-
-      data.push(...invoiceExist);
-    }
-
-    if (searchData.supply) {
-      const supplyExist = await this.searchSupplyUseCase.execute(
-        searchData.supply,
-      );
-
-      data.push(...supplyExist);
-    }
+    const data = results.flat();
 
     return data;
   }

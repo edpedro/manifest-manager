@@ -20,6 +20,7 @@ import { multerOptions, UploadDto } from 'src/upload/file-upload.dto';
 import { ReqUserDto } from 'src/auth/dto/req-user.dto';
 import { DateShipmentDto } from '../dto/date-shipment.dto';
 import { Response } from 'express';
+import { SearchDto } from '../dto/search';
 
 @Controller('shipment')
 @UseGuards(AuthGuard('jwt'))
@@ -91,8 +92,8 @@ export class ShipmentController {
   }
 
   @Post('search')
-  search(@Body() updateShipmentDto: UpdateShipmentDto, @Req() req: ReqUserDto) {
-    return this.shipmentService.search(updateShipmentDto, req);
+  search(@Body() searchData: SearchDto) {
+    return this.shipmentService.search(searchData);
   }
 
   @Patch(':id')
