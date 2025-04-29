@@ -275,7 +275,7 @@ export class ShipmentService {
     XLSX.writeFile(wb, 'lista.xlsx');
 
     const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
-    res.download(file, `lista_STs${numbers}.xlsx`);
+    res.download(file, `lista_STs${numbers.join('')}.xlsx`);
 
     return stExist;
   }
@@ -306,7 +306,7 @@ export class ShipmentService {
     XLSX.writeFile(wb, 'lista.xlsx');
 
     const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
-    res.download(file, `lista_supplys${numbers}.xlsx`);
+    res.download(file, `lista_supplys${numbers.join('')}.xlsx`);
 
     return supplyExist;
   }
@@ -346,5 +346,131 @@ export class ShipmentService {
       console.log(error);
       throw new HttpException('Dados não cadastrados', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async modelExcel(@Res() res: Response) {
+    const st: any[] = [
+      {
+        st: '',
+        supply: '',
+        invoice_number: '',
+        invoice_issue_date: '',
+        destination: '',
+        carrier: '',
+        transport_mode: '',
+        Valeu_invoice: '',
+        category: '',
+      },
+    ];
+
+    const renamedResults = await renameExpedicaoFields(st);
+
+    const numbers = Array.from({ length: 3 }, () =>
+      Math.floor(Math.random() * 101),
+    );
+
+    const ws = XLSX.utils.json_to_sheet(renamedResults);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    XLSX.writeFile(wb, 'lista.xlsx');
+
+    const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
+    res.download(file, `lista_modelo${numbers.join('')}.xlsx`);
+
+    return;
+  }
+
+  async modelExpeditionExcel(@Res() res: Response) {
+    const st: any[] = [
+      {
+        st: '',
+        supply: '',
+        invoice_number: '',
+        invoice_issue_date: '',
+        destination: '',
+        carrier: '',
+        transport_mode: '',
+        Valeu_invoice: '',
+        category: '',
+        name: '',
+        transport: '',
+        cpf: '',
+        dispatch_date: '',
+        dispatch_time: '',
+      },
+    ];
+
+    const renamedResults = await renameExpedicaoFields(st);
+
+    const numbers = Array.from({ length: 3 }, () =>
+      Math.floor(Math.random() * 101),
+    );
+
+    const ws = XLSX.utils.json_to_sheet(renamedResults);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    XLSX.writeFile(wb, 'lista.xlsx');
+
+    const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
+    res.download(file, `lista_expedicao${numbers.join('')}.xlsx`);
+
+    return;
+  }
+
+  async dashboard() {
+    const result = await this.listAllShipmentUseCase.execute();
+
+    let TotalSupply: number = 0;
+    let TotalSt: number = 0;
+    let SomaValeu: number = 0;
+    let TotalExpedition: number = 0;
+
+    result.forEach((item) => {
+      if (item.supply !== null && item.status === 'Expedido') {
+        TotalExpedition = TotalExpedition + 1;
+      }
+      if (item.supply !== null) {
+        TotalSupply = TotalSupply + 1;
+      }
+      if (item.Valeu_invoice !== null) {
+        SomaValeu += item.Valeu_invoice;
+      }
+    });
+
+    const removeDuplicatesSts = Array.from(
+      new Set(result.map((d) => d.st)),
+    ).map((st) => {
+      return result.find((value) => value.st === st);
+    });
+
+    removeDuplicatesSts.forEach((item) => {
+      if (item?.st !== null) {
+        TotalSt = TotalSt + 1;
+      }
+    });
+
+    function formatDate(date: Date | null) {
+      if (!date) return null; // Ou '' se quiser
+      return new Date(date).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+    }
+
+    const supplyDate = result.map((item) => ({
+      supply: item.supply,
+      date: formatDate(item.invoice_issue_date),
+    }));
+
+    return {
+      data: {
+        TotalSupply,
+        TotalSt,
+        SomaValeu,
+        TotalExpedition,
+        supplyDate,
+      },
+    };
   }
 }

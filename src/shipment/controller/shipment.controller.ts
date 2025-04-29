@@ -22,7 +22,7 @@ import { DateShipmentDto } from '../dto/date-shipment.dto';
 import { Response } from 'express';
 
 @Controller('shipment')
-@UseGuards(AuthGuard('jwt'))
+//@UseGuards(AuthGuard('jwt'))
 export class ShipmentController {
   constructor(private readonly shipmentService: ShipmentService) {}
 
@@ -30,6 +30,18 @@ export class ShipmentController {
   @UseInterceptors(FileInterceptor('file', multerOptions))
   uploadExcel(@UploadedFile() file: UploadDto, @Req() req: ReqUserDto) {
     return this.shipmentService.create(file, req);
+  }
+
+  @Get('/model/export')
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  modelExcel(@Res() res: Response) {
+    return this.shipmentService.modelExcel(res);
+  }
+
+  @Get('/expedition/model/export')
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  modelExpeditionExcel(@Res() res: Response) {
+    return this.shipmentService.modelExpeditionExcel(res);
   }
 
   @Post('/expedition')
@@ -104,5 +116,10 @@ export class ShipmentController {
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: ReqUserDto) {
     return this.shipmentService.remove(+id, req);
+  }
+
+  @Get('data/dashboard')
+  dashboard() {
+    return this.shipmentService.dashboard();
   }
 }

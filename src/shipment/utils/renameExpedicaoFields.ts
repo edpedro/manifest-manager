@@ -10,6 +10,11 @@ const FIELD_NAMES = {
   transport_mode: 'Modal',
   Valeu_invoice: 'Valor',
   category: 'Categoria',
+  name: 'Nome',
+  transport: 'Transporte',
+  cpf: 'CPF',
+  dispatch_date: 'Data Expedição',
+  dispatch_time: 'Hora Expedição',
 };
 
 export async function renameExpedicaoFields(results: ShipmentDto[]) {
