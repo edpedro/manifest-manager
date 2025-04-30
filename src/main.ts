@@ -2,10 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
+import { UnauthorizedExceptionFilter } from './auth/strategy/unauthorized-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
+
+  app.useGlobalFilters(new UnauthorizedExceptionFilter());
 
   app.enableCors();
 
