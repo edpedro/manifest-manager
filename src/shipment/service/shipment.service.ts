@@ -1,5 +1,11 @@
 import { CreateShipmentUseCase } from './../usecases/create-shipment.usecase';
-import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Res,
+} from '@nestjs/common';
 import { UpdateShipmentDto } from '../dto/update-shipment.dto';
 import { UploadDto } from 'src/upload/file-upload.dto';
 import { ReqUserDto } from 'src/auth/dto/req-user.dto';
@@ -27,7 +33,8 @@ import { ListAllStShipmentUseCase } from '../usecases/list-allSt-shipment.usecas
 import { expeditionExcelManager } from '../utils/expeditionExcelManager';
 import { ListBySupplysShipmentUseCase } from '../usecases/list-bySupplys-shipment.usecase';
 import { UpdateExpeditionShipmentUseCase } from '../usecases/update-expedition-shipment.usecase';
-import { SearchDto } from '../dto/search';
+import { ExtradorDto, SearchDto } from '../dto/search';
+import { FindAllSTSupplyNFShipmentUseCase } from '../usecases/find-all-shipment.usecase';
 
 @Injectable()
 export class ShipmentService {
@@ -48,6 +55,7 @@ export class ShipmentService {
     private readonly listAllStShipmentUseCase: ListAllStShipmentUseCase,
     private readonly listBySupplysShipmentUseCase: ListBySupplysShipmentUseCase,
     private readonly updateExpeditionShipmentUseCase: UpdateExpeditionShipmentUseCase,
+    private readonly findAllSTSupplyNFShipmentUseCase: FindAllSTSupplyNFShipmentUseCase,
   ) {}
   async create(file: UploadDto, req: ReqUserDto) {
     const dataExcel = await createExcelManager(file, req.user.id);
@@ -226,29 +234,72 @@ export class ShipmentService {
 
     const result = await this.dateFindAllUseCase.execute(date_start, date_end);
 
-    const renamedResults = await renameExpedicaoFields(result);
+    if (!Array.isArray(result) || result.length === 0) {
+      console.log('Entrou');
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        statusCode: 400,
+        message: 'Dados não encontrados',
+      });
+    }
 
-    const ws = XLSX.utils.json_to_sheet(renamedResults);
-    const wb = XLSX.utils.book_new();
+    try {
+      const resultsWithStringDates = result.map((item) => {
+        const formattedItem = { ...item };
+        Object.keys(formattedItem).forEach((key) => {
+          if (formattedItem[key] instanceof Date) {
+            const date = new Date(formattedItem[key]);
+            // Formata como string no formato desejado
+            formattedItem[key] = date.toLocaleDateString('pt-BR');
+          }
+        });
+        return formattedItem;
+      });
 
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      const renamedResults = await renameExpedicaoFields(
+        resultsWithStringDates,
+      );
 
-    XLSX.writeFile(wb, 'lista.xlsx');
+      const ws = XLSX.utils.json_to_sheet(renamedResults);
+      const wb = XLSX.utils.book_new();
 
-    const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
-    res.download(file, `lista_${date_start}-${date_end}.xlsx`);
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
+      XLSX.writeFile(wb, 'lista.xlsx');
+
+      const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
+      res.download(file, `lista_${date_start}-${date_end}.xlsx`);
+    } catch (error) {
+      throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
+    }
     return result;
   }
 
-  async exportStExcel(st: string[], req: ReqUserDto, @Res() res: Response) {
-    const stExist = await this.listAllStShipmentUseCase.execute(st);
+  async exportStSupplyNFExcel(
+    data: ExtradorDto,
+    req: ReqUserDto,
+    @Res() res: Response,
+  ) {
+    const results = await this.findAllSTSupplyNFShipmentUseCase.execute(
+      data.valeu,
+    );
 
-    if (!stExist) {
+    if (results.length <= 0) {
       throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
     }
 
-    const renamedResults = await renameExpedicaoFields(stExist);
+    const resultsWithStringDates = results.map((item) => {
+      const formattedItem = { ...item };
+      Object.keys(formattedItem).forEach((key) => {
+        if (formattedItem[key] instanceof Date) {
+          const date = new Date(formattedItem[key]);
+          // Formata como string no formato desejado
+          formattedItem[key] = date.toLocaleDateString('pt-BR');
+        }
+      });
+      return formattedItem;
+    });
+
+    const renamedResults = await renameExpedicaoFields(resultsWithStringDates);
 
     const numbers = Array.from({ length: 3 }, () =>
       Math.floor(Math.random() * 101),
@@ -264,38 +315,7 @@ export class ShipmentService {
     const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
     res.download(file, `lista_STs${numbers.join('')}.xlsx`);
 
-    return stExist;
-  }
-
-  async exportSupplyExcel(
-    supply: string[],
-    req: ReqUserDto,
-    @Res() res: Response,
-  ) {
-    const supplyExist =
-      await this.listAllSupplysShipmentUseCase.execute(supply);
-
-    if (!supplyExist) {
-      throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
-    }
-
-    const renamedResults = await renameExpedicaoFields(supplyExist);
-
-    const numbers = Array.from({ length: 3 }, () =>
-      Math.floor(Math.random() * 101),
-    );
-
-    const ws = XLSX.utils.json_to_sheet(renamedResults);
-    const wb = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-    XLSX.writeFile(wb, 'lista.xlsx');
-
-    const file = join(__dirname, '..', '..', '..', 'lista.xlsx');
-    res.download(file, `lista_supplys${numbers.join('')}.xlsx`);
-
-    return supplyExist;
+    return results;
   }
 
   async ExpeditionExcel(file: UploadDto, req: ReqUserDto) {
@@ -331,7 +351,15 @@ export class ShipmentService {
       return updatedSupplies;
     } catch (error) {
       console.log(error);
-      throw new HttpException('Dados não cadastrados', HttpStatus.BAD_REQUEST);
+
+      if (
+        error instanceof BadRequestException ||
+        error instanceof HttpException
+      ) {
+        throw error; // mantém a mensagem original
+      }
+
+      throw new HttpException('Dados não atualizado', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -440,15 +468,38 @@ export class ShipmentService {
       }
     });
 
-    function formatDate(date: Date | null) {
-      if (!date) return null; // Ou '' se quiser
-      return new Date(date).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+    function countSuppliesPorData(dados: ShipmentDto[]) {
+      const resultado: {
+        [key: string]: { dataCompleta: string; count: number };
+      } = {};
+
+      dados.forEach((item) => {
+        if (!item.invoice_issue_date || !item.supply) return;
+
+        const date = new Date(item.invoice_issue_date);
+        const ano = date.getFullYear();
+        const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+        const dia = date.getDate().toString().padStart(2, '0');
+
+        const chave = `${ano}-${mes}-${dia}`; // Formato YYYY-MM-DD
+
+        if (!resultado[chave]) {
+          resultado[chave] = {
+            dataCompleta: chave,
+            count: 0,
+          };
+        }
+
+        resultado[chave].count++;
+      });
+
+      // Ordena por data (do mais antigo para o mais recente)
+      return Object.values(resultado).sort((a, b) =>
+        a.dataCompleta.localeCompare(b.dataCompleta),
+      );
     }
 
-    const supplyDate = result.map((item) => ({
-      supply: item.supply,
-      date: formatDate(item.invoice_issue_date),
-    }));
+    const totaisPorMes = countSuppliesPorData(result);
 
     return {
       data: {
@@ -456,7 +507,7 @@ export class ShipmentService {
         TotalSt,
         SomaValeu,
         TotalExpedition,
-        supplyDate,
+        totaisPorMes,
       },
     };
   }

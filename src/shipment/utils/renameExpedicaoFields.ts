@@ -10,6 +10,7 @@ const FIELD_NAMES = {
   transport_mode: 'Modal',
   Valeu_invoice: 'Valor',
   category: 'Categoria',
+  status: 'Status',
   name: 'Nome',
   transport: 'Transporte',
   cpf: 'CPF',

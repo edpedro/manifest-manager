@@ -63,12 +63,9 @@ export class ShipmentRepository {
 
     return shipments.map((shipment) => ({
       ...shipment,
-      name: shipment.user?.first_name ?? null,
       Valeu_invoice:
         shipment.Valeu_invoice !== null ? Number(shipment.Valeu_invoice) : null,
-      dispatch_date: shipment.dispatch_date
-        ? shipment.dispatch_date.toISOString()
-        : null,
+      dispatch_date: shipment.dispatch_date ?? null,
     }));
   }
 
@@ -120,12 +117,10 @@ export class ShipmentRepository {
       Valeu_invoice: shipment.Valeu_invoice
         ? shipment.Valeu_invoice.toNumber()
         : null,
-      name: shipment.user?.first_name ?? null,
+      name: shipment.name ?? null,
       transport: shipment.transport ?? null,
       cpf: shipment.cpf ?? null,
-      dispatch_date: shipment.dispatch_date
-        ? shipment.dispatch_date.toISOString()
-        : null,
+      dispatch_date: shipment.dispatch_date ?? null,
       dispatch_time: shipment.dispatch_time ?? null,
       status: shipment.status ?? null,
       observation: shipment.observation ?? null,
@@ -186,9 +181,7 @@ export class ShipmentRepository {
       name: shipment.user?.first_name ?? null,
       transport: shipment.transport ?? null,
       cpf: shipment.cpf ?? null,
-      dispatch_date: shipment.dispatch_date
-        ? shipment.dispatch_date.toISOString()
-        : null,
+      dispatch_date: shipment.dispatch_date ?? null,
       dispatch_time: shipment.dispatch_time ?? null,
       status: shipment.status ?? null,
       observation: shipment.observation ?? null,
@@ -389,9 +382,6 @@ export class ShipmentRepository {
       name: shipment.user?.first_name ?? null,
       Valeu_invoice:
         shipment.Valeu_invoice !== null ? Number(shipment.Valeu_invoice) : null,
-      dispatch_date: shipment.dispatch_date
-        ? shipment.dispatch_date.toISOString()
-        : null,
     }));
   }
 
@@ -432,9 +422,6 @@ export class ShipmentRepository {
       name: shipment.user?.first_name ?? null,
       Valeu_invoice:
         shipment.Valeu_invoice !== null ? Number(shipment.Valeu_invoice) : null,
-      dispatch_date: shipment.dispatch_date
-        ? shipment.dispatch_date.toISOString()
-        : null,
     }));
   }
 
@@ -475,9 +462,6 @@ export class ShipmentRepository {
       name: shipment.user?.first_name ?? null,
       Valeu_invoice:
         shipment.Valeu_invoice !== null ? Number(shipment.Valeu_invoice) : null,
-      dispatch_date: shipment.dispatch_date
-        ? shipment.dispatch_date.toISOString()
-        : null,
     }));
   }
 
@@ -524,12 +508,8 @@ export class ShipmentRepository {
 
     return shipments.map((shipment) => ({
       ...shipment,
-      name: shipment.user?.first_name ?? null,
       Valeu_invoice:
         shipment.Valeu_invoice !== null ? Number(shipment.Valeu_invoice) : null,
-      dispatch_date: shipment.dispatch_date
-        ? shipment.dispatch_date.toISOString()
-        : null,
     }));
   }
 
@@ -596,12 +576,9 @@ export class ShipmentRepository {
       Valeu_invoice: shipment.Valeu_invoice
         ? shipment.Valeu_invoice.toNumber()
         : null,
-      name: shipment.user?.first_name ?? null,
       transport: shipment.transport ?? null,
       cpf: shipment.cpf ?? null,
-      dispatch_date: shipment.dispatch_date
-        ? shipment.dispatch_date.toISOString()
-        : null,
+      dispatch_date: shipment.dispatch_date ?? null,
       dispatch_time: shipment.dispatch_time ?? null,
       status: shipment.status ?? null,
       observation: shipment.observation ?? null,
@@ -667,9 +644,7 @@ export class ShipmentRepository {
       name: updateShipment.user?.first_name ?? null,
       transport: updateShipment.transport ?? null,
       cpf: updateShipment.cpf ?? null,
-      dispatch_date: updateShipment.dispatch_date
-        ? updateShipment.dispatch_date.toISOString()
-        : null,
+      dispatch_date: updateShipment.dispatch_date ?? null,
       dispatch_time: updateShipment.dispatch_time ?? null,
       status: updateShipment.status ?? null,
       observation: updateShipment.observation ?? null,
@@ -679,5 +654,48 @@ export class ShipmentRepository {
         first_name: updateShipment.user.first_name,
       },
     };
+  }
+
+  async findAllSupplyStNF(value: string[]): Promise<ShipmentDto[]> {
+    const shipments = await this.prisma.shipment.findMany({
+      where: {
+        OR: [
+          { supply: { in: value } },
+          { st: { in: value } },
+          { invoice_number: { in: value } },
+        ],
+      },
+      select: {
+        id: true,
+        st: true,
+        supply: true,
+        invoice_number: true,
+        invoice_issue_date: true,
+        destination: true,
+        carrier: true,
+        transport_mode: true,
+        Valeu_invoice: true,
+        category: true,
+        name: true,
+        transport: true,
+        cpf: true,
+        dispatch_date: true,
+        dispatch_time: true,
+        status: true,
+        observation: true,
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+          },
+        },
+      },
+    });
+
+    return shipments.map((shipment) => ({
+      ...shipment,
+      Valeu_invoice:
+        shipment.Valeu_invoice !== null ? Number(shipment.Valeu_invoice) : null,
+    }));
   }
 }

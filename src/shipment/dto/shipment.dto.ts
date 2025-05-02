@@ -12,7 +12,7 @@ export class ShipmentDto {
   name?: string | null;
   transport?: string | null;
   cpf?: string | null;
-  dispatch_date?: string | null;
+  dispatch_date?: Date | null;
   dispatch_time?: string | null;
   status?: string | null;
   observation?: string | null;

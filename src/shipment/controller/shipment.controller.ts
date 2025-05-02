@@ -20,7 +20,7 @@ import { multerOptions, UploadDto } from 'src/upload/file-upload.dto';
 import { ReqUserDto } from 'src/auth/dto/req-user.dto';
 import { DateShipmentDto } from '../dto/date-shipment.dto';
 import { Response } from 'express';
-import { SearchDto } from '../dto/search';
+import { ExtradorDto, SearchDto } from '../dto/search';
 
 @Controller('shipment')
 @UseGuards(AuthGuard('jwt'))
@@ -63,22 +63,13 @@ export class ShipmentController {
     return this.shipmentService.exportDateExcel(data, req, res);
   }
 
-  @Post('/st/export')
+  @Post('/export')
   exportStExcel(
-    @Body() st: string[],
+    @Body() valeu: ExtradorDto,
     @Req() req: ReqUserDto,
     @Res() res: Response,
   ) {
-    return this.shipmentService.exportStExcel(st, req, res);
-  }
-
-  @Post('/supply/export')
-  exportSupplyExcel(
-    @Body() supply: string[],
-    @Req() req: ReqUserDto,
-    @Res() res: Response,
-  ) {
-    return this.shipmentService.exportSupplyExcel(supply, req, res);
+    return this.shipmentService.exportStSupplyNFExcel(valeu, req, res);
   }
 
   @Get()

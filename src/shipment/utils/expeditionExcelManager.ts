@@ -36,21 +36,29 @@ export async function expeditionExcelManager(
     );
   }
 
-  function validateColumns(data: Record<string, any>[]) {
-    const headerKeys = Object.keys(data[0])
-      .map((k) => k.trim())
-      .sort();
-    const expectedKeys = Object.values(FIELD_NAMES)
-      .map((k) => k.trim())
-      .sort();
+  function validateColumnsFromSheet(sheet: XLSX.WorkSheet) {
+    const range = XLSX.utils.decode_range(sheet['!ref'] || ''); // Ex: A1:I3
+    const firstRow = range.s.r; // linha inicial (normalmente 0)
+    const expectedHeaders = Object.values(FIELD_NAMES).map((v) => v.trim());
 
-    const isValid = expectedKeys.every(
-      (key, index) => key === headerKeys[index],
+    const headersFromSheet: string[] = [];
+
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: firstRow, c: col });
+      const cell = sheet[cellAddress];
+      const header = cell?.v?.toString().trim();
+
+      if (!header) continue;
+      headersFromSheet.push(header);
+    }
+
+    const missing = expectedHeaders.filter(
+      (header) => !headersFromSheet.includes(header),
     );
 
-    if (!isValid) {
+    if (missing.length) {
       throw new HttpException(
-        'As colunas do Excel não correspondem',
+        `As colunas do Excel não correspondem às esperadas. Faltando: ${missing.join(', ')}`,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -75,6 +83,9 @@ export async function expeditionExcelManager(
         FIELD_NAMES.dispatch_time,
       ];
 
+      console.log(row[FIELD_NAMES.invoice_issue_date]);
+      console.log(row[FIELD_NAMES.dispatch_date]);
+
       const missingFields = requiredFields.filter((field) => {
         const value = row[field];
         return (
@@ -98,8 +109,8 @@ export async function expeditionExcelManager(
         transport_mode: String(row[FIELD_NAMES.transport_mode]).toUpperCase(),
         Valeu_invoice: Number(row[FIELD_NAMES.Valeu_invoice]),
         category: String(row[FIELD_NAMES.category]),
-        name: String(row[FIELD_NAMES.name]),
-        transport: String(row[FIELD_NAMES.transport]),
+        name: String(row[FIELD_NAMES.name]).toUpperCase(),
+        transport: String(row[FIELD_NAMES.transport]).toUpperCase(),
         cpf: String(row[FIELD_NAMES.cpf]),
         dispatch_date: parseExcelDate(row[FIELD_NAMES.dispatch_date]),
         dispatch_time: parseExcelTime(row[FIELD_NAMES.dispatch_time]),
@@ -149,7 +160,7 @@ export async function expeditionExcelManager(
 
     return '00:00';
   }
-  validateColumns(dataJson);
+  validateColumnsFromSheet(sheet);
 
   return transformToDto(dataJson);
 }

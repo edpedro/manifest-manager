@@ -31,21 +31,29 @@ export async function createExcelManager(
     );
   }
 
-  function validateColumns(data: Record<string, any>[]) {
-    const headerKeys = Object.keys(data[0])
-      .map((k) => k.trim())
-      .sort();
-    const expectedKeys = Object.values(FIELD_NAMES)
-      .map((k) => k.trim())
-      .sort();
+  function validateColumnsFromSheet(sheet: XLSX.WorkSheet) {
+    const range = XLSX.utils.decode_range(sheet['!ref'] || ''); // Ex: A1:I3
+    const firstRow = range.s.r; // linha inicial (normalmente 0)
+    const expectedHeaders = Object.values(FIELD_NAMES).map((v) => v.trim());
 
-    const isValid = expectedKeys.every(
-      (key, index) => key === headerKeys[index],
+    const headersFromSheet: string[] = [];
+
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: firstRow, c: col });
+      const cell = sheet[cellAddress];
+      const header = cell?.v?.toString().trim();
+
+      if (!header) continue;
+      headersFromSheet.push(header);
+    }
+
+    const missing = expectedHeaders.filter(
+      (header) => !headersFromSheet.includes(header),
     );
 
-    if (!isValid) {
+    if (missing.length) {
       throw new HttpException(
-        `As colunas do Excel não correspondem às esperadas.\nEsperadas: ${expectedKeys.join(', ')}\nEncontradas: ${headerKeys.join(', ')}`,
+        `As colunas do Excel não correspondem às esperadas. Faltando: ${missing.join(', ')}`,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -113,7 +121,7 @@ export async function createExcelManager(
 
     return new Date().toISOString();
   }
-  validateColumns(dataJson);
+  validateColumnsFromSheet(sheet);
 
   return transformToDto(dataJson);
 }

@@ -3,10 +3,10 @@ import { ShipmentRepository } from '../repositories/shipment.repository';
 import { ShipmentDto } from '../dto/shipment.dto';
 
 @Injectable()
-export class DateFindAllUseCase {
+export class FindAllSTSupplyNFShipmentUseCase {
   constructor(private readonly shipmentRepository: ShipmentRepository) {}
 
-  async execute(date_start: string, date_end: string): Promise<ShipmentDto[]> {
-    return this.shipmentRepository.findDateShipment(date_start, date_end);
+  async execute(valeu: string[]): Promise<ShipmentDto[]> {
+    return this.shipmentRepository.findAllSupplyStNF(valeu);
   }
 }
