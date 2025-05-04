@@ -82,9 +82,19 @@ export class ShipmentService {
 
       dataCreate.push(...result);
     }
+    const removeDuplicatesBySupply = (dataCreate: any[]) => {
+      const seen = new Set();
+      return dataCreate.filter((item) => {
+        if (seen.has(item.supply)) return false;
+        seen.add(item.supply);
+        return true;
+      });
+    };
 
     try {
-      await this.createShipmentUseCase.execute(dataCreate);
+      const duplicate = removeDuplicatesBySupply(dataCreate);
+
+      await this.createShipmentUseCase.execute(duplicate);
 
       return { dataCreate, dataError };
     } catch (error) {
@@ -321,36 +331,54 @@ export class ShipmentService {
   async ExpeditionExcel(file: UploadDto, req: ReqUserDto) {
     try {
       const dataExcel = await expeditionExcelManager(file, req.user.id);
-
+      const batchSize = 50;
       const updatedSupplies: ShipmentDto[] = [];
 
-      for (const item of dataExcel) {
-        const existing = await this.listBySupplysShipmentUseCase.execute(
-          item.supply,
-        );
+      for (let i = 0; i < dataExcel.length; i += batchSize) {
+        const batch = dataExcel.slice(i, i + batchSize);
 
-        if (existing) {
-          const updateData: UpdateShipmentDto = {
-            name: item.name,
-            transport: item.transport,
-            cpf: item.cpf,
-            dispatch_date: item.dispatch_date,
-            dispatch_time: item.dispatch_time,
-            status: 'Expedido',
-          };
+        const batchPromises = batch.map(async (item) => {
+          try {
+            const existing = await this.listBySupplysShipmentUseCase.execute(
+              item.supply,
+            );
 
-          const update = await this.updateExpeditionShipmentUseCase.execute(
-            existing.id,
-            updateData,
-            req.user.id,
-          );
-          updatedSupplies.push(update);
-        }
+            if (existing) {
+              const updateData: UpdateShipmentDto = {
+                name: item.name,
+                transport: item.transport,
+                cpf: item.cpf,
+                dispatch_date: item.dispatch_date,
+                dispatch_time: item.dispatch_time,
+                status: 'Expedido',
+              };
+
+              return this.updateExpeditionShipmentUseCase.execute(
+                existing.id,
+                updateData,
+                req.user.id,
+              );
+            }
+            return null;
+          } catch (itemError) {
+            return null;
+          }
+        });
+
+        // Aguarda a conclusão de todas as promessas do lote atual
+        const batchResults = await Promise.allSettled(batchPromises);
+
+        // Filtra apenas os resultados bem-sucedidos
+        batchResults.forEach((result) => {
+          if (result.status === 'fulfilled' && result.value) {
+            updatedSupplies.push(result.value);
+          }
+        });
       }
 
       return updatedSupplies;
     } catch (error) {
-      console.log(error);
+      console.error('Erro completo na expedição:', error);
 
       if (
         error instanceof BadRequestException ||
@@ -359,7 +387,7 @@ export class ShipmentService {
         throw error; // mantém a mensagem original
       }
 
-      throw new HttpException('Dados não atualizado', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Dados não atualizados', HttpStatus.BAD_REQUEST);
     }
   }
 

@@ -83,9 +83,6 @@ export async function expeditionExcelManager(
         FIELD_NAMES.dispatch_time,
       ];
 
-      console.log(row[FIELD_NAMES.invoice_issue_date]);
-      console.log(row[FIELD_NAMES.dispatch_date]);
-
       const missingFields = requiredFields.filter((field) => {
         const value = row[field];
         return (
