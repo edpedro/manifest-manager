@@ -35,6 +35,7 @@ import { ListBySupplysShipmentUseCase } from '../usecases/list-bySupplys-shipmen
 import { UpdateExpeditionShipmentUseCase } from '../usecases/update-expedition-shipment.usecase';
 import { ExtradorDto, SearchDto } from '../dto/search';
 import { FindAllSTSupplyNFShipmentUseCase } from '../usecases/find-all-shipment.usecase';
+import pLimit from 'p-limit';
 
 @Injectable()
 export class ShipmentService {
@@ -331,60 +332,51 @@ export class ShipmentService {
   async ExpeditionExcel(file: UploadDto, req: ReqUserDto) {
     try {
       const dataExcel = await expeditionExcelManager(file, req.user.id);
-      const batchSize = 50;
+      const limit = pLimit(5); // máx 5 execuções simultâneas
       const updatedSupplies: ShipmentDto[] = [];
 
-      for (let i = 0; i < dataExcel.length; i += batchSize) {
-        const batch = dataExcel.slice(i, i + batchSize);
+      const promises = dataExcel.map((item) =>
+        limit(async () => {
+          const existing = await this.listBySupplysShipmentUseCase.execute(
+            item.supply,
+          );
 
-        const batchPromises = batch.map(async (item) => {
-          try {
-            const existing = await this.listBySupplysShipmentUseCase.execute(
-              item.supply,
+          if (existing) {
+            const updateData: UpdateShipmentDto = {
+              name: item.name,
+              transport: item.transport,
+              cpf: item.cpf,
+              dispatch_date: item.dispatch_date,
+              dispatch_time: item.dispatch_time,
+              status: 'Expedido',
+            };
+
+            return this.updateExpeditionShipmentUseCase.execute(
+              existing.id,
+              updateData,
+              req.user.id,
             );
-
-            if (existing) {
-              const updateData: UpdateShipmentDto = {
-                name: item.name,
-                transport: item.transport,
-                cpf: item.cpf,
-                dispatch_date: item.dispatch_date,
-                dispatch_time: item.dispatch_time,
-                status: 'Expedido',
-              };
-
-              return this.updateExpeditionShipmentUseCase.execute(
-                existing.id,
-                updateData,
-                req.user.id,
-              );
-            }
-            return null;
-          } catch (itemError) {
-            return null;
           }
-        });
+          return null;
+        }),
+      );
 
-        // Aguarda a conclusão de todas as promessas do lote atual
-        const batchResults = await Promise.allSettled(batchPromises);
+      const results = await Promise.allSettled(promises);
 
-        // Filtra apenas os resultados bem-sucedidos
-        batchResults.forEach((result) => {
-          if (result.status === 'fulfilled' && result.value) {
-            updatedSupplies.push(result.value);
-          }
-        });
-      }
+      results.forEach((res) => {
+        if (res.status === 'fulfilled' && res.value) {
+          updatedSupplies.push(res.value);
+        }
+      });
 
       return updatedSupplies;
     } catch (error) {
       console.error('Erro completo na expedição:', error);
-
       if (
         error instanceof BadRequestException ||
         error instanceof HttpException
       ) {
-        throw error; // mantém a mensagem original
+        throw error;
       }
 
       throw new HttpException('Dados não atualizados', HttpStatus.BAD_REQUEST);
