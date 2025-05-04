@@ -94,8 +94,8 @@ export class ShipmentService {
 
     try {
       const duplicate = removeDuplicatesBySupply(dataCreate);
-
-      await this.createShipmentUseCase.execute(duplicate);
+      console.log(duplicate);
+      // await this.createShipmentUseCase.execute(duplicate);
 
       return { dataCreate, dataError };
     } catch (error) {
@@ -246,7 +246,6 @@ export class ShipmentService {
     const result = await this.dateFindAllUseCase.execute(date_start, date_end);
 
     if (!Array.isArray(result) || result.length === 0) {
-      console.log('Entrou');
       return res.status(HttpStatus.BAD_REQUEST).json({
         statusCode: 400,
         message: 'Dados não encontrados',
@@ -260,7 +259,9 @@ export class ShipmentService {
           if (formattedItem[key] instanceof Date) {
             const date = new Date(formattedItem[key]);
             // Formata como string no formato desejado
-            formattedItem[key] = date.toLocaleDateString('pt-BR');
+            formattedItem[key] = date.toLocaleDateString('pt-BR', {
+              timeZone: 'UTC',
+            });
           }
         });
         return formattedItem;
@@ -304,7 +305,9 @@ export class ShipmentService {
         if (formattedItem[key] instanceof Date) {
           const date = new Date(formattedItem[key]);
           // Formata como string no formato desejado
-          formattedItem[key] = date.toLocaleDateString('pt-BR');
+          formattedItem[key] = date.toLocaleDateString('pt-BR', {
+            timeZone: 'UTC',
+          });
         }
       });
       return formattedItem;
