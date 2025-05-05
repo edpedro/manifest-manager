@@ -94,8 +94,8 @@ export class ShipmentService {
 
     try {
       const duplicate = removeDuplicatesBySupply(dataCreate);
-      console.log(duplicate);
-      // await this.createShipmentUseCase.execute(duplicate);
+      
+      await this.createShipmentUseCase.execute(duplicate);
 
       return { dataCreate, dataError };
     } catch (error) {
