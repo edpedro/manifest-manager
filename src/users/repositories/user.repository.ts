@@ -18,6 +18,7 @@ export class UserRepository {
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
+        type: data.type,
         username: data.username,
         password: hashedPassword,
       },
@@ -25,6 +26,7 @@ export class UserRepository {
         id: true,
         first_name: true,
         last_name: true,
+        type: true,
         email: true,
         username: true,
       },
@@ -51,6 +53,7 @@ export class UserRepository {
         first_name: true,
         last_name: true,
         email: true,
+        type: true,
         password: true,
         username: true,
       },
@@ -67,6 +70,7 @@ export class UserRepository {
         first_name: true,
         last_name: true,
         email: true,
+        type: true,
         username: true,
       },
     });
@@ -79,6 +83,7 @@ export class UserRepository {
         first_name: true,
         last_name: true,
         email: true,
+        type: true,
         username: true,
       },
     });
@@ -95,6 +100,7 @@ export class UserRepository {
         first_name: true,
         last_name: true,
         email: true,
+        type: true,
         username: true,
       },
     });

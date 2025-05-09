@@ -75,6 +75,7 @@ export class UsersService {
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
+        type: data.type,
         username: data.username,
       };
 

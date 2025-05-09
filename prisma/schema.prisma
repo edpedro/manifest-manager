@@ -16,12 +16,14 @@ model User {
   email   String @unique
   username   String @unique
   password   String  
+  type   String
   active Boolean @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
   shipment Shipment[]
   history History[]
+  shipping Shipping[]
 
   
   @@map("users")
@@ -52,7 +54,7 @@ model Shipment {
   user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   history History[]
-
+  shipmentShipping ShipmentShipping[]
  
   @@index([st, supply, invoice_number])
   @@map("shipment")
@@ -71,4 +73,51 @@ model History {
 
    
    @@map("history")
+}
+model Shipping{
+  id           Int        @id @default(autoincrement())
+  name  String
+  cpf                 String
+  placa               String
+  dispatch_date       DateTime
+  dispatch_time       String?
+  transport           String
+  estimatedArrival    String
+  status              String? @default("Pendente")
+  statusEmail         String?
+  isConfirm           Boolean? @default(false)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  user_id      String  
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  shipmentShipping ShipmentShipping[]
+
+  @@map("shipping")
+}
+
+model ShipmentShipping {
+  shippingId  Int     
+  shipmentId    Int  
+  assignedAt DateTime @default(now()) @map("assigned_at")
+  created_at   DateTime @default(now())
+
+  shipping Shipping @relation(fields: [shippingId], references: [id], onDelete: Cascade)
+  shipment    Shipment    @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  
+  @@unique([shipmentId, shippingId])
+  @@id([shipmentId, shippingId])
+  @@map("shipment_shipping")
+}
+
+model Mail{
+  id            Int        @id @default(autoincrement())
+  name          String
+  email         String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+
+  @@map("mail")
 }

@@ -20,4 +20,8 @@ export class CreateUserDto {
   @IsString({ message: "O campo 'Senha' deve ser uma string." })
   @IsNotEmpty({ message: "O campo 'Senha' não pode estar vazio." })
   readonly password: string;
+
+  @IsString({ message: "O campo 'Tipo usuario' deve ser uma string." })
+  @IsNotEmpty({ message: "O campo 'Tipo usuario' não pode estar vazio." })
+  readonly type: string;
 }

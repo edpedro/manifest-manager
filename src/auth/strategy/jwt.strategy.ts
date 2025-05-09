@@ -16,6 +16,7 @@ export class JwtStarty extends PassportStrategy(Strategy) {
       first_name: paload.first_name,
       last_name: paload.last_name,
       username: paload.username,
+      type: paload.type,
     };
   }
 }
