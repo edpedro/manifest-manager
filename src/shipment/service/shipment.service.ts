@@ -94,7 +94,7 @@ export class ShipmentService {
 
     try {
       const duplicate = removeDuplicatesBySupply(dataCreate);
-      
+
       await this.createShipmentUseCase.execute(duplicate);
 
       return { dataCreate, dataError };
@@ -119,17 +119,18 @@ export class ShipmentService {
   }
 
   async search(search: SearchDto) {
-    const promises: Promise<ShipmentDto[]>[] = [];
+    try {
+      const results = await Promise.all([
+        this.searchStUseCase.execute(search.searchData),
+        this.searchInvoiceUseCase.execute(search.searchData),
+        this.searchSupplyUseCase.execute(search.searchData),
+      ]);
 
-    promises.push(this.searchStUseCase.execute(search.searchData));
-    promises.push(this.searchInvoiceUseCase.execute(search.searchData));
-    promises.push(this.searchSupplyUseCase.execute(search.searchData));
-
-    const results = await Promise.all(promises);
-
-    const data = results.flat();
-
-    return data;
+      return results.flat();
+    } catch (error) {
+      console.error('Erro interno na busca:', error);
+      throw new HttpException('Erro ao realizar busca', HttpStatus.NOT_FOUND);
+    }
   }
 
   async update(

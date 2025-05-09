@@ -1,46 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `history` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `shipment` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `shipment_shipping` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `shipping` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `users` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "public"."history" DROP CONSTRAINT "history_shipment_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "public"."history" DROP CONSTRAINT "history_user_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "public"."shipment" DROP CONSTRAINT "shipment_user_id_fkey";
-
--- DropForeignKey
-ALTER TABLE "public"."shipment_shipping" DROP CONSTRAINT "shipment_shipping_shipmentId_fkey";
-
--- DropForeignKey
-ALTER TABLE "public"."shipment_shipping" DROP CONSTRAINT "shipment_shipping_shippingId_fkey";
-
--- DropForeignKey
-ALTER TABLE "public"."shipping" DROP CONSTRAINT "shipping_user_id_fkey";
-
--- DropTable
-DROP TABLE "public"."history";
-
--- DropTable
-DROP TABLE "public"."shipment";
-
--- DropTable
-DROP TABLE "public"."shipment_shipping";
-
--- DropTable
-DROP TABLE "public"."shipping";
-
--- DropTable
-DROP TABLE "public"."users";
-
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -100,6 +57,7 @@ CREATE TABLE "shipping" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "cpf" TEXT NOT NULL,
+    "placa" TEXT NOT NULL,
     "dispatch_date" TIMESTAMP(3) NOT NULL,
     "dispatch_time" TEXT,
     "transport" TEXT NOT NULL,
@@ -124,6 +82,17 @@ CREATE TABLE "shipment_shipping" (
     CONSTRAINT "shipment_shipping_pkey" PRIMARY KEY ("shipmentId","shippingId")
 );
 
+-- CreateTable
+CREATE TABLE "mail" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "mail_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -132,6 +101,9 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 
 -- CreateIndex
 CREATE INDEX "shipment_st_supply_invoice_number_idx" ON "shipment"("st", "supply", "invoice_number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "shipment_shipping_shipmentId_shippingId_key" ON "shipment_shipping"("shipmentId", "shippingId");
 
 -- AddForeignKey
 ALTER TABLE "shipment" ADD CONSTRAINT "shipment_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
