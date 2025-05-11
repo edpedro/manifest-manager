@@ -17,8 +17,9 @@ export class ShippingRepository {
     });
   }
 
-  async findAllShipping() {
+  async findAllShipping(userId?: string) {
     return await this.prisma.shipping.findMany({
+      where: userId ? { user_id: userId } : undefined,
       include: {
         shipmentShipping: {
           select: {
@@ -35,10 +36,11 @@ export class ShippingRepository {
     });
   }
 
-  async findById(id: number) {
+  async findById(id: number, driverId?: string) {
     return await this.prisma.shipping.findUnique({
       where: {
         id,
+        ...(driverId && { user_id: driverId }),
       },
       include: {
         shipmentShipping: {

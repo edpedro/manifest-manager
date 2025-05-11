@@ -33,13 +33,13 @@ export class ShippingController {
   }
 
   @Get()
-  findAll() {
-    return this.shippingService.findAll();
+  findAll(@Req() req: ReqUserDto) {
+    return this.shippingService.findAll(req);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.shippingService.findOne(+id);
+  findOne(@Param('id') id: string, @Req() req: ReqUserDto) {
+    return this.shippingService.findOne(+id, req);
   }
 
   @Patch(':id')

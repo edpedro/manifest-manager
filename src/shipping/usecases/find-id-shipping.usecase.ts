@@ -5,7 +5,7 @@ import { ShippingRepository } from '../repositories/shippingRepository';
 export class FindIdShippingUseCase {
   constructor(private readonly shippingRepository: ShippingRepository) {}
 
-  async execute(id: number) {
-    return this.shippingRepository.findById(id);
+  async execute(id: number, driverId?: string) {
+    return this.shippingRepository.findById(id, driverId);
   }
 }

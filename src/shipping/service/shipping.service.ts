@@ -47,12 +47,16 @@ export class ShippingService {
     }
   }
 
-  async findAll() {
-    return await this.findAllShippingUseCase.execute();
+  async findAll(req: ReqUserDto) {
+    const driverId = req.user.type === 'driver' ? req.user.id : '';
+
+    return await this.findAllShippingUseCase.execute(driverId);
   }
 
-  async findOne(id: number) {
-    const result = await this.findIdShippingUseCase.execute(id);
+  async findOne(id: number, req: ReqUserDto) {
+    const driverId = req.user.type === 'driver' ? req.user.id : '';
+
+    const result = await this.findIdShippingUseCase.execute(id, driverId);
 
     if (!result) {
       throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
@@ -84,6 +88,13 @@ export class ShippingService {
     const result = await this.findIdShippingUseCase.execute(id);
 
     if (result?.status === 'Expedido') {
+      throw new HttpException(
+        'Não pode ser deletado, Romaneio já foi expedido',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (result?.isConfirm === true) {
       throw new HttpException(
         'Não pode ser deletado, Romaneio já foi expedido',
         HttpStatus.BAD_REQUEST,
@@ -179,6 +190,13 @@ export class ShippingService {
     }
 
     if (shippingExists?.status === 'Expedido') {
+      throw new HttpException(
+        'Não pode ser deletado, Romaneio já foi expedido',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (shippingExists?.isConfirm === true) {
       throw new HttpException(
         'Não pode ser deletado, Romaneio já foi expedido',
         HttpStatus.BAD_REQUEST,
