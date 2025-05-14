@@ -172,12 +172,21 @@ export class ShippingRepository {
       shipmentId.map((id) =>
         this.prisma.shipmentShipping.create({
           data: {
-            shippingId: shippingId,
+            shippingId,
             shipmentId: id,
           },
         }),
       ),
     );
+
+    await this.prisma.shipping.update({
+      where: {
+        id: shippingId,
+      },
+      data: {
+        statusEmail: '',
+      },
+    });
 
     return {
       message: 'Manifesto criado com sucesso',
@@ -206,12 +215,21 @@ export class ShippingRepository {
   }
 
   async deleteShipmentShipping(shipmentId: number, shippingId: number) {
-    return await this.prisma.shipmentShipping.delete({
+    await this.prisma.shipmentShipping.delete({
       where: {
         shipmentId_shippingId: {
           shipmentId,
           shippingId,
         },
+      },
+    });
+
+    await this.prisma.shipping.update({
+      where: {
+        id: shippingId,
+      },
+      data: {
+        statusEmail: null,
       },
     });
   }
