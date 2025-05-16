@@ -207,6 +207,13 @@ export class ShipmentService {
       );
     }
 
+    if (exist.status === 'Expedido') {
+      throw new HttpException(
+        'Nota fiscal não pode ser deletada!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     try {
       await this.deleteShipmentUseCase.execute(id);
 

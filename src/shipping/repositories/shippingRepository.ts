@@ -128,9 +128,7 @@ export class ShippingRepository {
         select: {
           shipmentShipping: {
             select: {
-              shipment: {
-                select: { id: true },
-              },
+              shipmentId: true,
             },
           },
         },
@@ -140,20 +138,24 @@ export class ShippingRepository {
         throw new Error(`Shipping com ID ${id} não encontrado`);
       }
 
-      await prisma.shipping.delete({
-        where: { id },
-      });
+      const shipmentIds = shipping.shipmentShipping.map((ss) => ss.shipmentId);
 
-      if (shipping.shipmentShipping.length > 0) {
+      if (shipmentIds.length > 0) {
+        await prisma.shipmentShipping.deleteMany({
+          where: {
+            shippingId: id,
+          },
+        });
+
         await Promise.all(
-          shipping.shipmentShipping.map(({ shipment }) =>
+          shipmentIds.map((shipmentId) =>
             prisma.shipment.update({
-              where: { id: shipment.id },
+              where: { id: shipmentId },
               data: {
                 name: '',
                 transport: '',
                 cpf: '',
-                dispatch_date: '',
+                dispatch_date: null,
                 dispatch_time: '',
                 status: 'Pendente',
               },
@@ -161,6 +163,10 @@ export class ShippingRepository {
           ),
         );
       }
+
+      await prisma.shipping.delete({
+        where: { id },
+      });
     });
   }
 
