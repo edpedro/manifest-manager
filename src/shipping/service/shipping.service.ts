@@ -72,6 +72,13 @@ export class ShippingService {
       throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
     }
 
+    if (result.status === 'Expedido') {
+      throw new HttpException(
+        'Não pode ser alterado, Romaneio já foi expedido',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     try {
       const result = await this.updateShippingUseCase.execute(
         id,
@@ -235,6 +242,13 @@ export class ShippingService {
     if (!updateShippingDto.dispatch_time && !updateShippingDto.dispatch_date) {
       throw new HttpException(
         'O campo Dispatch Time deve ser obrigatório.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (result.status === 'Expedido') {
+      throw new HttpException(
+        'Não pode ser deletado, Romaneio já foi expedido',
         HttpStatus.BAD_REQUEST,
       );
     }

@@ -230,13 +230,28 @@ export class ShippingRepository {
       },
     });
 
+    const remaining = await this.prisma.shipping.findUnique({
+      where: { id: shippingId },
+      select: {
+        shipmentShipping: {
+          select: { shipmentId: true },
+        },
+      },
+    });
+
+    const dataToUpdate: any = {
+      statusEmail: null,
+    };
+
+    if (!remaining?.shipmentShipping.length) {
+      dataToUpdate.status = 'Pendente';
+    }
+
     await this.prisma.shipping.update({
       where: {
         id: shippingId,
       },
-      data: {
-        statusEmail: null,
-      },
+      data: dataToUpdate,
     });
   }
 }

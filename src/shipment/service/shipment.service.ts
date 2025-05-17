@@ -144,6 +144,20 @@ export class ShipmentService {
       throw new HttpException('Dados não encontrado', HttpStatus.NOT_FOUND);
     }
 
+    if (data.status === 'Expedido') {
+      throw new HttpException(
+        'Não pode ser alterado, Nota fiscal já foi expedido',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (req.user.type === 'driver') {
+      throw new HttpException(
+        'Não tem permissão para alterar',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     try {
       const update = await this.updateShipmentUseCase.execute(
         id,
@@ -178,6 +192,20 @@ export class ShipmentService {
       throw new HttpException('ST já existe', HttpStatus.NOT_FOUND);
     }
 
+    if (stExist.status === 'Expedido') {
+      throw new HttpException(
+        'Não pode ser alterado, Nota fiscal já foi expedido',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (req.user.type === 'driver') {
+      throw new HttpException(
+        'Não tem permissão para alterar',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     try {
       const update = await this.updateSTShipmentUseCase.execute(
         stExist.st,
@@ -210,6 +238,13 @@ export class ShipmentService {
     if (exist.status === 'Expedido') {
       throw new HttpException(
         'Nota fiscal não pode ser deletada!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (req.user.type === 'driver') {
+      throw new HttpException(
+        'Não tem permissão para alterar',
         HttpStatus.NOT_FOUND,
       );
     }
