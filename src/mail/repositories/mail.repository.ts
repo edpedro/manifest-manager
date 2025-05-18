@@ -26,6 +26,14 @@ export class MailRepository {
     });
   }
 
+  async findById(id: number): Promise<any> {
+    return await this.prisma.mail.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
   async updateMail(id: number, data: UpdateMailDto): Promise<any> {
     return await this.prisma.mail.update({
       where: {

@@ -12,6 +12,7 @@ import { UpdateMailDto } from '../dto/update-mail.dto';
 import { FindEMailMailUseCase } from '../usecase/find-mail-mail.usecase';
 import { FindIdMailMailUseCase } from '../usecase/find-id-mail.usecase';
 import { UpdateStatusMailShippingUseCase } from 'src/shipping/usecases/update-statusMail-shipping.usecase';
+import { FindByIdMailMailUseCase } from '../usecase/find-byId-mail.usecase';
 
 @Injectable()
 export class MailService {
@@ -25,6 +26,7 @@ export class MailService {
     private readonly updateMailUseCase: UpdateMailUseCase,
     private readonly findIdMailMailUseCase: FindIdMailMailUseCase,
     private readonly updateStatusMailShippingUseCase: UpdateStatusMailShippingUseCase,
+    private readonly findByIdMailMailUseCase: FindByIdMailMailUseCase,
   ) {}
 
   async sendConfirmationEmail(id: number, res: Response): Promise<void> {
@@ -118,6 +120,16 @@ export class MailService {
 
   async findAll() {
     return await this.findAllMailMailUseCase.execute();
+  }
+
+  async findByMailId(id: number) {
+    const result = await this.findByIdMailMailUseCase.execute(id);
+
+    if (!result) {
+      throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
+    }
+
+    return result;
   }
 
   async update(id: number, data: UpdateMailDto) {

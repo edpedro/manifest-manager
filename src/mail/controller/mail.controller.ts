@@ -41,7 +41,12 @@ export class MailController {
     return this.mailService.findAll();
   }
 
-  @Patch()
+  @Get('list/:id')
+  findById(@Param('id') id: string) {
+    return this.mailService.findByMailId(+id);
+  }
+
+  @Patch(':id')
   update(@Param('id') id: string, @Body() data: UpdateMailDto) {
     return this.mailService.update(+id, data);
   }

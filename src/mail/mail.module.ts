@@ -17,6 +17,7 @@ import { UpdateMailUseCase } from './usecase/update-mail.usecase';
 import { FindEMailMailUseCase } from './usecase/find-mail-mail.usecase';
 import { FindIdMailMailUseCase } from './usecase/find-id-mail.usecase';
 import { UpdateStatusMailShippingUseCase } from 'src/shipping/usecases/update-statusMail-shipping.usecase';
+import { FindByIdMailMailUseCase } from './usecase/find-byId-mail.usecase';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { UpdateStatusMailShippingUseCase } from 'src/shipping/usecases/update-st
     UpdateMailUseCase,
     FindIdMailMailUseCase,
     UpdateStatusMailShippingUseCase,
+    FindByIdMailMailUseCase,
   ],
 })
 export class MailModule {}
