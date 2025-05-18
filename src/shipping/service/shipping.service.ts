@@ -36,12 +36,52 @@ export class ShippingService {
   ) {}
 
   async create(createShippingDto: CreateShippingDto, req: ReqUserDto) {
+    function validateDate(dispatchDateString: string) {
+      const now = new Date();
+
+      const dispatchDate = new Date(dispatchDateString);
+
+      const timeZone = 'America/Sao_Paulo';
+
+      const formatter = new Intl.DateTimeFormat('pt-BR', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+
+      const todayStr = formatter.format(now);
+      const dispatchStr = formatter.format(dispatchDate);
+
+      function parsePtBrDate(str: string) {
+        const [dia, mes, ano] = str.split('/');
+        return new Date(`${ano}-${mes}-${dia}T00:00:00`);
+      }
+
+      const todayDate = parsePtBrDate(todayStr);
+      const dispatchClean = parsePtBrDate(dispatchStr);
+
+      const diffMs = dispatchClean.getTime() - todayDate.getTime();
+
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+      if (diffDays < -1 || diffDays > 1) {
+        throw new HttpException(
+          'A data só pode ser até 1 dia antes ou 1 dia depois da data atual',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return true;
+    }
+
+    validateDate(createShippingDto.dispatch_date);
     try {
       const result = await this.createShippingUseCase.execute(
         createShippingDto,
         req.user.id,
       );
-      return result;
+      return 'result';
     } catch (error) {
       console.log(error);
     }
@@ -94,6 +134,10 @@ export class ShippingService {
   async remove(id: number) {
     const result = await this.findIdShippingUseCase.execute(id);
 
+    if (!result) {
+      throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
+    }
+
     if (result?.status === 'Expedido') {
       throw new HttpException(
         'Não pode ser deletado, Romaneio já foi expedido',
@@ -108,8 +152,11 @@ export class ShippingService {
       );
     }
 
-    if (!result) {
-      throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
+    if (result.shipmentShipping.length > 0) {
+      throw new HttpException(
+        'Não pode ser deletado, há notas fiscais vinculadas.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     try {
@@ -248,9 +295,58 @@ export class ShippingService {
 
     if (result.status === 'Expedido') {
       throw new HttpException(
-        'Não pode ser deletado, Romaneio já foi expedido',
+        'Não pode ser atualziada, Romaneio já foi expedido',
         HttpStatus.BAD_REQUEST,
       );
+    }
+
+    if (result.shipmentShipping.length === 0) {
+      throw new HttpException(
+        'Não pode ser atualizada, há notas fiscais vinculadas.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (updateShippingDto.dispatch_date) {
+      function validateDate(dispatchDateString: string) {
+        const now = new Date();
+
+        const dispatchDate = new Date(dispatchDateString);
+
+        const timeZone = 'America/Sao_Paulo';
+
+        const formatter = new Intl.DateTimeFormat('pt-BR', {
+          timeZone,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        });
+
+        const todayStr = formatter.format(now);
+        const dispatchStr = formatter.format(dispatchDate);
+
+        function parsePtBrDate(str: string) {
+          const [dia, mes, ano] = str.split('/');
+          return new Date(`${ano}-${mes}-${dia}T00:00:00`);
+        }
+
+        const todayDate = parsePtBrDate(todayStr);
+        const dispatchClean = parsePtBrDate(dispatchStr);
+
+        const diffMs = dispatchClean.getTime() - todayDate.getTime();
+
+        const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+        if (diffDays < -1 || diffDays > 1) {
+          throw new HttpException(
+            'A data só pode ser até 1 dia antes ou 1 dia depois da data atual',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        return true;
+      }
+      validateDate(updateShippingDto.dispatch_date);
     }
 
     try {
@@ -278,6 +374,56 @@ export class ShippingService {
         'Campos data e hora obrigatório',
         HttpStatus.BAD_REQUEST,
       );
+    }
+
+    if (shippingExists.shipmentShipping.length === 0) {
+      throw new HttpException(
+        'Não pode ser atualizada, há notas fiscais vinculadas.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (data.dispatch_date) {
+      function validateDate(dispatchDateString: string) {
+        const now = new Date();
+
+        const dispatchDate = new Date(dispatchDateString);
+
+        const timeZone = 'America/Sao_Paulo';
+
+        const formatter = new Intl.DateTimeFormat('pt-BR', {
+          timeZone,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        });
+
+        const todayStr = formatter.format(now);
+        const dispatchStr = formatter.format(dispatchDate);
+
+        function parsePtBrDate(str: string) {
+          const [dia, mes, ano] = str.split('/');
+          return new Date(`${ano}-${mes}-${dia}T00:00:00`);
+        }
+
+        const todayDate = parsePtBrDate(todayStr);
+        const dispatchClean = parsePtBrDate(dispatchStr);
+
+        const diffMs = dispatchClean.getTime() - todayDate.getTime();
+
+        const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+        if (diffDays < -1 || diffDays > 1) {
+          throw new HttpException(
+            'A data só pode ser até 1 dia antes ou 1 dia depois da data atual',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        return true;
+      }
+
+      validateDate(data.dispatch_date);
     }
 
     try {

@@ -66,8 +66,15 @@ export class MailService {
         ],
       });
 
-      function getSaudacao() {
-        const horaAtual = new Date().getHours();
+      function getSaudacao(): string {
+        const data = new Date();
+        const horaBrasilia = new Intl.DateTimeFormat('pt-BR', {
+          hour: 'numeric',
+          hour12: false,
+          timeZone: 'America/Sao_Paulo',
+        }).format(data);
+
+        const horaAtual = Number(horaBrasilia);
 
         if (horaAtual >= 5 && horaAtual < 12) {
           return 'Bom dia';
@@ -77,6 +84,7 @@ export class MailService {
           return 'Boa noite';
         }
       }
+
       await this.updateStatusMailShippingUseCase.execute(id);
 
       res.status(200).json({ message: 'Email enviado' });
