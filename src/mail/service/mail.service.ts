@@ -58,7 +58,7 @@ export class MailService {
           placa: data.placa.toUpperCase(),
           motorista: data.name.toUpperCase(),
           cpf: data.cpf,
-          previsao_chegada: '22:30',
+          previsao_chegada: data.estimatedArrival,
         },
         attachments: [
           {

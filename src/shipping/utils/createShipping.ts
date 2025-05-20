@@ -13,6 +13,7 @@ interface ShippingData {
   dispatch_date: Date | string | null;
   transport: string;
   status: string | null;
+  estimatedArrival: string;
   shipmentShipping: Array<{
     shipment: {
       id: number;
@@ -93,9 +94,9 @@ export async function generateRomaneioExcel(data: ShippingData) {
   sheet.getCell('G6').value = format(dispatchDate, 'dd/MM/yyyy', {
     locale: ptBR as Locale,
   });
-  sheet.getCell('G7').value = format(new Date(), 'HH:mm', {
-    locale: ptBR as Locale,
-  });
+  // sheet.getCell('G7').value = format(data.estimatedArrival, 'HH:mm', {
+  //   locale: ptBR as Locale,
+  // });
 
   sheet.getCell('B7').value = 'TRANSPORTE';
   sheet.getCell('C7').value = data.transport.toUpperCase() || '';
