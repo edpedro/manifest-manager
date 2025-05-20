@@ -178,6 +178,13 @@ export class ShippingService {
       );
     }
 
+    if (shippingExists?.status === 'Expedido') {
+      throw new HttpException(
+        'Nota fiscal não pode ser incluida, Romaneio já foi expedido',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const shipmentExists = await this.listIdSShipmentUseCase.execute(
       data.shipmentId,
     );
