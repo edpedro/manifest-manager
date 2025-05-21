@@ -14,7 +14,6 @@ import { EmailQueueService } from 'src/mail/Queue/EmailQueueService';
 import { JwtService } from '@nestjs/jwt';
 import { UpdatePasswordUserUseCase } from '../usecases/update-password.user.usecase';
 import { PasswordUserDto } from '../dto/emailPassword-user.dto';
-import { ResetPasswordUserDto } from '../dto/resetPassword-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -151,16 +150,16 @@ export class UsersService {
     return { message: 'Email enviado com sucesso' };
   }
 
-  async resetPassword(data: ResetPasswordUserDto) {
+  async resetPassword(token: string, newPassword: string) {
     let payload;
     try {
-      payload = await this.jwtService.verifyAsync(data.token, {
+      payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.SECRET_KEY,
       });
 
       const userId = payload.sub;
 
-      const hashedPassword = await EncryptedPassword(data.password);
+      const hashedPassword = await EncryptedPassword(newPassword);
 
       await this.updatePasswordUserUseCase.execute(userId, hashedPassword);
 

@@ -64,5 +64,6 @@ import { FindByIdMailMailUseCase } from './usecase/find-byId-mail.usecase';
     UpdateStatusMailShippingUseCase,
     FindByIdMailMailUseCase,
   ],
+  exports: [EmailQueueService],
 })
 export class MailModule {}

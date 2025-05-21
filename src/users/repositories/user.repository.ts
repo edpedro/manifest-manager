@@ -113,4 +113,23 @@ export class UserRepository {
       },
     });
   }
+
+  async updatePassword(id: string, hashedPassword: string) {
+    return await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        password: hashedPassword,
+      },
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true,
+        email: true,
+        type: true,
+        username: true,
+      },
+    });
+  }
 }
