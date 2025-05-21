@@ -90,7 +90,29 @@ export class ShippingService {
   async findAll(req: ReqUserDto) {
     const driverId = req.user.type === 'driver' ? req.user.id : '';
 
-    return await this.findAllShippingUseCase.execute(driverId);
+    const now = new Date();
+
+    const timeZone = 'America/Sao_Paulo';
+
+    const result = await this.findAllShippingUseCase.execute(driverId);
+
+    const formatter = new Intl.DateTimeFormat('pt-BR', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+
+    const data = result.filter((item) => {
+      if (item.status === 'Expedido') {
+        return formatter.format(item.dispatch_date) === formatter.format(now);
+      } else if (item.status === 'Conferência' || item.status === 'Pendente') {
+        return true;
+      }
+      return false;
+    });
+
+    return data;
   }
 
   async findOne(id: number, req: ReqUserDto) {
