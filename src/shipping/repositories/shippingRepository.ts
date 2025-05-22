@@ -58,6 +58,14 @@ export class ShippingRepository {
     });
   }
 
+  async findByCPF(cpf: string) {
+    return await this.prisma.shipping.findFirst({
+      where: {
+        cpf,
+      },
+    });
+  }
+
   async updateShipping(id: number, data: UpdateShippingDto): Promise<any> {
     return await this.prisma.shipping.update({
       where: {

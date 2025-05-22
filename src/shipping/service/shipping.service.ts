@@ -17,6 +17,7 @@ import { UpdateManifestDto } from '../dto/update-manifest.dto';
 import { ListIdShipmentUseCase } from 'src/shipment/usecases/list-id-shipment.usecase';
 import { UpdateStatusShippingUseCase } from '../usecases/update-status-shipping.usecase';
 import { UpdateExpeditionShippingUseCase } from '../usecases/update-expedition-shipping.usecase';
+import { FindCPFShippingUseCase } from '../usecases/find-cpf-shipping.usecase';
 
 @Injectable()
 export class ShippingService {
@@ -33,9 +34,23 @@ export class ShippingService {
     private readonly listIdShipmentUseCase: ListIdShipmentUseCase,
     private readonly updateStatusShippingUseCase: UpdateStatusShippingUseCase,
     private readonly updateExpeditionShippingUseCase: UpdateExpeditionShippingUseCase,
+    private readonly findCPFShippingUseCase: FindCPFShippingUseCase,
   ) {}
 
   async create(createShippingDto: CreateShippingDto, req: ReqUserDto) {
+    const cpfExists = await this.findCPFShippingUseCase.execute(
+      createShippingDto.cpf,
+    );
+
+    if (cpfExists) {
+      if (cpfExists?.name !== createShippingDto.name.toUpperCase()) {
+        throw new HttpException(
+          'Inconsistência nos dados: o CPF informado está vinculado a um nome diferente do fornecido.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
     function validateDate(dispatchDateString: string) {
       const now = new Date();
 
@@ -81,7 +96,7 @@ export class ShippingService {
         createShippingDto,
         req.user.id,
       );
-      return 'result';
+      return result;
     } catch (error) {
       console.log(error);
     }

@@ -17,6 +17,7 @@ import { ListIdShipmentUseCase } from 'src/shipment/usecases/list-id-shipment.us
 import { UpdateStatusShippingUseCase } from './usecases/update-status-shipping.usecase';
 import { UpdateStatusMailShippingUseCase } from './usecases/update-statusMail-shipping.usecase';
 import { UpdateExpeditionShippingUseCase } from './usecases/update-expedition-shipping.usecase';
+import { FindCPFShippingUseCase } from './usecases/find-cpf-shipping.usecase';
 
 @Module({
   controllers: [ShippingController],
@@ -38,6 +39,7 @@ import { UpdateExpeditionShippingUseCase } from './usecases/update-expedition-sh
     UpdateStatusShippingUseCase,
     UpdateStatusMailShippingUseCase,
     UpdateExpeditionShippingUseCase,
+    FindCPFShippingUseCase,
   ],
 })
 export class ShippingModule {}
