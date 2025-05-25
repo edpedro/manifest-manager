@@ -181,31 +181,46 @@ export class ShippingRepository {
   async createManifest(data: CreateManifestDto): Promise<any> {
     const { shippingId, shipmentId } = data;
 
-    // Criar múltiplas relações entre o shipping e cada shipment
-    const createdRelations = await this.prisma.$transaction(
-      shipmentId.map((id) =>
-        this.prisma.shipmentShipping.create({
-          data: {
-            shippingId,
-            shipmentId: id,
-          },
-        }),
-      ),
-    );
+    const result = await this.prisma.$transaction(async (prisma) => {
+      const createdRelations = await Promise.all(
+        shipmentId.map((id) =>
+          prisma.shipmentShipping.create({
+            data: {
+              shippingId,
+              shipmentId: id,
+            },
+          }),
+        ),
+      );
 
-    await this.prisma.shipping.update({
-      where: {
-        id: shippingId,
-      },
-      data: {
-        statusEmail: '',
-      },
+      await prisma.shipment.updateMany({
+        where: {
+          id: {
+            in: shipmentId,
+          },
+        },
+        data: {
+          status: 'Em romaneio',
+        },
+      });
+
+      await prisma.shipping.update({
+        where: {
+          id: shippingId,
+        },
+        data: {
+          statusEmail: '',
+          status: 'Conferência',
+        },
+      });
+
+      return createdRelations;
     });
 
     return {
       message: 'Manifesto criado com sucesso',
-      count: createdRelations.length,
-      relations: createdRelations,
+      count: result.length,
+      relations: result,
     };
   }
 
@@ -229,37 +244,52 @@ export class ShippingRepository {
   }
 
   async deleteShipmentShipping(shipmentId: number, shippingId: number) {
-    await this.prisma.shipmentShipping.delete({
-      where: {
-        shipmentId_shippingId: {
-          shipmentId,
-          shippingId,
+    await this.prisma.$transaction(async (prisma) => {
+      await prisma.shipmentShipping.delete({
+        where: {
+          shipmentId_shippingId: {
+            shipmentId,
+            shippingId,
+          },
         },
-      },
+      });
+
+      await prisma.shipment.update({
+        where: {
+          id: shipmentId,
+        },
+        data: {
+          status: 'Pendente',
+        },
+      });
+
+      const remaining = await prisma.shipping.findUnique({
+        where: { id: shippingId },
+        select: {
+          shipmentShipping: {
+            select: { shipmentId: true },
+          },
+        },
+      });
+
+      const dataToUpdate: any = {
+        statusEmail: null,
+      };
+
+      if (!remaining?.shipmentShipping.length) {
+        dataToUpdate.status = 'Pendente';
+      }
+
+      await prisma.shipping.update({
+        where: {
+          id: shippingId,
+        },
+        data: dataToUpdate,
+      });
     });
 
-    const remaining = await this.prisma.shipping.findUnique({
-      where: { id: shippingId },
-      select: {
-        shipmentShipping: {
-          select: { shipmentId: true },
-        },
-      },
-    });
-
-    const dataToUpdate: any = {
-      statusEmail: null,
+    return {
+      message: 'Shipment removido do romaneio com sucesso',
     };
-
-    if (!remaining?.shipmentShipping.length) {
-      dataToUpdate.status = 'Pendente';
-    }
-
-    await this.prisma.shipping.update({
-      where: {
-        id: shippingId,
-      },
-      data: dataToUpdate,
-    });
   }
 }
