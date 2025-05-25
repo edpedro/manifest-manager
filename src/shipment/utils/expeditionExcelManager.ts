@@ -105,7 +105,7 @@ export async function expeditionExcelManager(
         carrier: String(row[FIELD_NAMES.carrier]).toUpperCase(),
         transport_mode: String(row[FIELD_NAMES.transport_mode]).toUpperCase(),
         Valeu_invoice: Number(row[FIELD_NAMES.Valeu_invoice]),
-        category: String(row[FIELD_NAMES.category]),
+        category: String(row[FIELD_NAMES.category]).toUpperCase(),
         name: String(row[FIELD_NAMES.name]).toUpperCase(),
         transport: String(row[FIELD_NAMES.transport]).toUpperCase(),
         cpf: String(row[FIELD_NAMES.cpf]),

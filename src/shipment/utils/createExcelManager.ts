@@ -95,7 +95,7 @@ export async function createExcelManager(
         carrier: String(row[FIELD_NAMES.carrier]).toUpperCase(),
         transport_mode: String(row[FIELD_NAMES.transport_mode]).toUpperCase(),
         Valeu_invoice: Number(row[FIELD_NAMES.Valeu_invoice]),
-        category: String(row[FIELD_NAMES.category]),
+        category: String(row[FIELD_NAMES.category]).toUpperCase(),
         user_id: user,
       };
     });
