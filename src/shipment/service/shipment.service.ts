@@ -242,6 +242,13 @@ export class ShipmentService {
       );
     }
 
+    if (exist.status === 'Em romaneio') {
+      throw new HttpException(
+        'Nota fiscal está vinculada ao romaneio!',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     if (req.user.type === 'driver') {
       throw new HttpException(
         'Não tem permissão para alterar',
