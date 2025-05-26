@@ -105,7 +105,7 @@ export class ShippingRepository {
         cpf: true,
         dispatch_date: true,
         shipmentShipping: {
-          select: {
+           include: {
             shipment: true,
           },
         },
