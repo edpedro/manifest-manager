@@ -87,11 +87,12 @@ export class ShippingRepository {
     });
   }
 
-  async updateShippingStatus(
-    id: number,
-    updateShippingDto: UpdateShippingDto,
-  ): Promise<any> {
-    const result = await this.prisma.shipping.update({
+async updateShippingStatus(
+  id: number,
+  updateShippingDto: UpdateShippingDto,
+): Promise<any> {
+  return await this.prisma.$transaction(async (tx) => {
+    const result = await tx.shipping.update({
       where: { id },
       data: {
         status: 'Expedido',
@@ -99,13 +100,9 @@ export class ShippingRepository {
         dispatch_date: updateShippingDto.dispatch_date,
         dispatch_time: updateShippingDto.dispatch_time,
       },
-      select: {
-        name: true,
-        transport: true,
-        cpf: true,
-        dispatch_date: true,
+      include: {
         shipmentShipping: {
-           include: {
+          include: {
             shipment: true,
           },
         },
@@ -113,8 +110,12 @@ export class ShippingRepository {
     });
 
     await Promise.all(
-      result.shipmentShipping.map((item) =>
-        this.prisma.shipment.update({
+      result.shipmentShipping.map((item) => {
+        if (!item.shipment) {
+          console.warn('Shipment não encontrado para o item:', item);
+          return;
+        }
+        return tx.shipment.update({
           where: { id: item.shipment.id },
           data: {
             name: result.name,
@@ -124,10 +125,13 @@ export class ShippingRepository {
             dispatch_time: updateShippingDto.dispatch_time,
             status: 'Expedido',
           },
-        }),
-      ),
+        });
+      }),
     );
-  }
+
+    return result;
+  });
+}
 
   async removeShipping(id: number): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
