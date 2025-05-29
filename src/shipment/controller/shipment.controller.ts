@@ -114,4 +114,9 @@ export class ShipmentController {
   dashboard() {
     return this.shipmentService.dashboard();
   }
+
+  @Get('invoice/pending')
+  pendingInShipping() {
+    return this.shipmentService.findAllPendingShipping();
+  }
 }

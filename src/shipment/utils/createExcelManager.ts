@@ -104,22 +104,28 @@ export async function createExcelManager(
   function parseExcelDate(dateCell: any): string {
     if (!dateCell) return new Date().toISOString();
 
+    let jsDate: Date;
+
     if (typeof dateCell === 'string') {
-      const parsed = new Date(dateCell);
-      return isNaN(parsed.getTime())
-        ? new Date().toISOString()
-        : parsed.toISOString();
-    }
-
-    if (typeof dateCell === 'number') {
+      jsDate = new Date(dateCell);
+      if (isNaN(jsDate.getTime())) {
+        jsDate = new Date();
+      }
+    } else if (typeof dateCell === 'number') {
       const excelDate = XLSX.SSF.parse_date_code(dateCell);
-      if (!excelDate || !excelDate.y) return new Date().toISOString();
-
-      const jsDate = new Date(excelDate.y, excelDate.m - 1, excelDate.d);
-      return jsDate.toISOString(); // <- aqui está o formato ISO-8601
+      if (!excelDate || !excelDate.y) {
+        jsDate = new Date();
+      } else {
+        // Criar data sem horário específico para evitar problemas de fuso
+        jsDate = new Date(excelDate.y, excelDate.m - 1, excelDate.d);
+      }
+    } else {
+      jsDate = new Date();
     }
 
-    return new Date().toISOString();
+    // OPÇÃO 1: Salvar apenas a data (meio-dia UTC para evitar problemas de fuso)
+    jsDate.setUTCHours(12, 0, 0, 0);
+    return jsDate.toISOString();
   }
   validateColumnsFromSheet(sheet);
 

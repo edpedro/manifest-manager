@@ -735,4 +735,49 @@ export class ShipmentRepository {
         shipment.Valeu_invoice !== null ? Number(shipment.Valeu_invoice) : null,
     }));
   }
+
+  async allPendingInShipping(): Promise<ShipmentDto[]> {
+    const shipments = await this.prisma.shipment.findMany({
+      where: {
+        status: {
+          in: ['Pendente', 'Em romaneio'],
+        },
+      },
+      orderBy: {
+        invoice_issue_date: 'asc',
+      },
+      select: {
+        id: true,
+        st: true,
+        supply: true,
+        invoice_number: true,
+        invoice_issue_date: true,
+        destination: true,
+        carrier: true,
+        transport_mode: true,
+        Valeu_invoice: true,
+        category: true,
+        name: true,
+        transport: true,
+        cpf: true,
+        dispatch_date: true,
+        dispatch_time: true,
+        status: true,
+        observation: true,
+        user: {
+          select: {
+            id: true,
+            first_name: true,
+          },
+        },
+      },
+    });
+
+    return shipments.map((shipment) => ({
+      ...shipment,
+      Valeu_invoice:
+        shipment.Valeu_invoice !== null ? Number(shipment.Valeu_invoice) : null,
+      dispatch_date: shipment.dispatch_date ?? null,
+    }));
+  }
 }

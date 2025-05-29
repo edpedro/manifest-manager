@@ -20,7 +20,7 @@ import { UpdateSTShipmentUseCase } from '../usecases/update-st-shipment.usecase'
 import { DeleteShipmentUseCase } from '../usecases/deletar-shipment.usecase';
 import { ListUserIdUseCase } from 'src/users/usecases/list-user-id.usecase';
 import { SearchStUseCase } from '../usecases/st-search-shipment.usecase';
-import { ShipmentDto } from '../dto/shipment.dto';
+import { ShipmentDto, ShipmentPendingDto } from '../dto/shipment.dto';
 import { SearchInvoiceUseCase } from '../usecases/invoice-search-shipment.usecase';
 import { SearchSupplyUseCase } from '../usecases/supply-search-shipment.usecase';
 import { DateShipmentDto } from '../dto/date-shipment.dto';
@@ -36,6 +36,7 @@ import { UpdateExpeditionShipmentUseCase } from '../usecases/update-expedition-s
 import { ExtradorDto, SearchDto } from '../dto/search';
 import { FindAllSTSupplyNFShipmentUseCase } from '../usecases/find-all-shipment.usecase';
 import pLimit from 'p-limit';
+import { FindAllPendingInShippingShipmentUseCase } from '../usecases/find-pendingInShipping-shipment.usecase';
 
 @Injectable()
 export class ShipmentService {
@@ -57,6 +58,7 @@ export class ShipmentService {
     private readonly listBySupplysShipmentUseCase: ListBySupplysShipmentUseCase,
     private readonly updateExpeditionShipmentUseCase: UpdateExpeditionShipmentUseCase,
     private readonly findAllSTSupplyNFShipmentUseCase: FindAllSTSupplyNFShipmentUseCase,
+    private readonly findAllPendingInShippingShipmentUseCase: FindAllPendingInShippingShipmentUseCase,
   ) {}
   async create(file: UploadDto, req: ReqUserDto) {
     const dataExcel = await createExcelManager(file, req.user.id);
@@ -106,6 +108,55 @@ export class ShipmentService {
 
   async findAll() {
     return await this.listAllShipmentUseCase.execute();
+  }
+
+  async findAllPendingShipping() {
+    const result = await this.findAllPendingInShippingShipmentUseCase.execute();
+
+    const now = new Date();
+    const timeZone = 'America/Sao_Paulo';
+
+    const pedingInShipping = result.map((invoice) => {
+      const newPening: ShipmentPendingDto = { ...invoice };
+
+      const formatter = new Intl.DateTimeFormat('pt-BR', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+
+      const todayStr = formatter.format(now);
+
+      function parsePtBrDate(str: string) {
+        const [dia, mes, ano] = str.split('/');
+        return new Date(`${ano}-${mes}-${dia}`);
+      }
+
+      function getDateOnly(date: Date): string {
+        return date.toISOString().split('T')[0];
+      }
+
+      const todayDate = parsePtBrDate(todayStr);
+      const dispatchDateStr = getDateOnly(invoice.invoice_issue_date);
+
+      const dispatchClean = new Date(dispatchDateStr);
+
+      const diffMs = dispatchClean.getTime() - todayDate.getTime();
+
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+      if (diffDays <= -3) {
+        newPening.cor = 'red';
+      } else if (diffDays <= -2) {
+        newPening.cor = 'yellow';
+      } else {
+        newPening.cor = 'green';
+      }
+      return newPening;
+    });
+
+    return pedingInShipping;
   }
 
   async findOne(id: number) {
@@ -283,11 +334,9 @@ export class ShipmentService {
       const data = new Date(dataString);
 
       if (finalDoDia) {
-        // Ajusta para 03:00:00 do dia seguinte para garantir que inclui até esse horário
-        data.setDate(data.getDate() + 1);
-        data.setHours(3, 0, 0, 0);
+        data.setUTCHours(23, 59, 59, 999); // sem conversão de fuso
       } else {
-        data.setHours(3, 0, 0, 0);
+        data.setUTCHours(0, 0, 0, 0); // sem conversão de fuso
       }
 
       return data.toISOString();

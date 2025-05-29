@@ -3,7 +3,7 @@ export class ShipmentDto {
   st: string;
   supply: string;
   invoice_number: string;
-  invoice_issue_date: Date | null;
+  invoice_issue_date: Date;
   destination: string;
   carrier: string;
   transport_mode: string;
@@ -20,4 +20,7 @@ export class ShipmentDto {
     id: string;
     first_name: string;
   };
+}
+export interface ShipmentPendingDto extends ShipmentDto {
+  cor?: string;
 }

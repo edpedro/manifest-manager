@@ -23,6 +23,7 @@ import { ListBySupplysShipmentUseCase } from './usecases/list-bySupplys-shipment
 import { UpdateExpeditionShipmentUseCase } from './usecases/update-expedition-shipment.usecase';
 import { FindAllSTSupplyNFShipmentUseCase } from './usecases/find-all-shipment.usecase';
 import { ListIdSShipmentUseCase } from './usecases/list-ids-shipment.usecase';
+import { FindAllPendingInShippingShipmentUseCase } from './usecases/find-pendingInShipping-shipment.usecase';
 
 @Module({
   controllers: [ShipmentController],
@@ -49,6 +50,7 @@ import { ListIdSShipmentUseCase } from './usecases/list-ids-shipment.usecase';
     UpdateExpeditionShipmentUseCase,
     FindAllSTSupplyNFShipmentUseCase,
     ListIdSShipmentUseCase,
+    FindAllPendingInShippingShipmentUseCase,
   ],
 })
 export class ShipmentModule {}
