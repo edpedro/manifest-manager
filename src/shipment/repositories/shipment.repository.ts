@@ -31,6 +31,22 @@ export class ShipmentRepository {
       },
     });
   }
+  async invoicesAllShipment(data: string[]): Promise<any> {
+    return await this.prisma.shipment.findMany({
+      where: {
+        invoice_number: {
+          in: data,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            first_name: true,
+          },
+        },
+      },
+    });
+  }
 
   async findAllShipment(): Promise<ShipmentDto[]> {
     const shipments = await this.prisma.shipment.findMany({
@@ -41,6 +57,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -81,6 +99,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -144,6 +164,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -357,6 +379,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -397,6 +421,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -437,6 +463,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -486,6 +514,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -542,6 +572,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -607,6 +639,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -672,6 +706,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -709,6 +745,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,
@@ -753,6 +791,8 @@ export class ShipmentRepository {
         invoice_number: true,
         invoice_issue_date: true,
         destination: true,
+        city: true,
+        uf: true,
         carrier: true,
         transport_mode: true,
         Valeu_invoice: true,

@@ -20,6 +20,14 @@ export class CreateShipmentDto {
   @IsNotEmpty({ message: "O campo 'Invoice Issue Date' não pode estar vazio." })
   readonly invoice_issue_date: string;
 
+  @IsString({ message: "O campo 'City' deve ser uma string." })
+  @IsNotEmpty({ message: "O campo 'City' não pode estar vazio." })
+  readonly city: string;
+
+  @IsString({ message: "O campo 'UF' deve ser uma string." })
+  @IsNotEmpty({ message: "O campo 'UF' não pode estar vazio." })
+  readonly uf: string;
+
   @IsString({ message: "O campo 'Destination' deve ser uma string." })
   @IsNotEmpty({ message: "O campo 'Destination' não pode estar vazio." })
   readonly destination: string;

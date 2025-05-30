@@ -35,6 +35,8 @@ model Shipment {
   supply              String
   invoice_number      String
   invoice_issue_date  DateTime
+  city                String
+  uf                  String
   destination         String
   carrier             String
   transport_mode      String

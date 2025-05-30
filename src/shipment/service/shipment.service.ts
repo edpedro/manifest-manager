@@ -37,6 +37,7 @@ import { ExtradorDto, SearchDto } from '../dto/search';
 import { FindAllSTSupplyNFShipmentUseCase } from '../usecases/find-all-shipment.usecase';
 import pLimit from 'p-limit';
 import { FindAllPendingInShippingShipmentUseCase } from '../usecases/find-pendingInShipping-shipment.usecase';
+import { ListAllInvoicesShipmentUseCase } from '../usecases/list-allInvoices-shipment.usecase';
 
 @Injectable()
 export class ShipmentService {
@@ -59,25 +60,40 @@ export class ShipmentService {
     private readonly updateExpeditionShipmentUseCase: UpdateExpeditionShipmentUseCase,
     private readonly findAllSTSupplyNFShipmentUseCase: FindAllSTSupplyNFShipmentUseCase,
     private readonly findAllPendingInShippingShipmentUseCase: FindAllPendingInShippingShipmentUseCase,
+    private readonly listAllInvoicesShipmentUseCase: ListAllInvoicesShipmentUseCase,
   ) {}
   async create(file: UploadDto, req: ReqUserDto) {
     const dataExcel = await createExcelManager(file, req.user.id);
 
     const supplys = dataExcel.map((supply) => supply.supply);
+    const invoices = dataExcel.map((supply) => supply.invoice_number);
 
-    const result = await this.listAllSupplysShipmentUseCase.execute(supplys);
+    const resultSupplys =
+      await this.listAllSupplysShipmentUseCase.execute(supplys);
+    const resultInvoices =
+      await this.listAllInvoicesShipmentUseCase.execute(invoices);
 
     let dataCreate: CreateShipmentDto[] = [];
     let dataError: CreateShipmentDto[] = [];
 
-    if (result.length > 0) {
-      const idsRemover = new Set(result.map((item) => item.supply));
+    if (resultSupplys.length > 0) {
+      const idsRemover = new Set(resultSupplys.map((item) => item.supply));
 
       const isRemover = dataExcel.filter(
         (item) => !idsRemover.has(item.supply),
       );
       dataCreate.push(...isRemover);
-      dataError.push(...result);
+      dataError.push(...resultSupplys);
+    } else if (resultInvoices.length > 0) {
+      const idsRemover = new Set(
+        resultInvoices.map((item) => item.invoice_number),
+      );
+
+      const isRemover = dataExcel.filter(
+        (item) => !idsRemover.has(item.invoice_number),
+      );
+      dataCreate.push(...isRemover);
+      dataError.push(...resultInvoices);
     } else {
       const idsRemover = new Set(dataError.map((item) => item.supply));
 
@@ -493,6 +509,8 @@ export class ShipmentService {
         invoice_number: '',
         invoice_issue_date: '',
         destination: '',
+        city: '',
+        uf: '',
         carrier: '',
         transport_mode: '',
         Valeu_invoice: '',
@@ -527,6 +545,8 @@ export class ShipmentService {
         invoice_number: '',
         invoice_issue_date: '',
         destination: '',
+        city: '',
+        uf: '',
         carrier: '',
         transport_mode: '',
         Valeu_invoice: '',

@@ -8,7 +8,9 @@ const FIELD_NAMES = {
   supply: 'Fornecimento',
   invoice_number: 'Nota fiscal',
   invoice_issue_date: 'Data de Emissão da NF',
-  destination: 'Destino',
+  destination: 'Destinatario',
+  city: 'Cidade',
+  uf: 'UF',
   carrier: 'Transportadora',
   transport_mode: 'Modal',
   Valeu_invoice: 'Valor',
@@ -67,6 +69,8 @@ export async function createExcelManager(
         FIELD_NAMES.invoice_number,
         FIELD_NAMES.invoice_issue_date,
         FIELD_NAMES.destination,
+        FIELD_NAMES.city,
+        FIELD_NAMES.uf,
         FIELD_NAMES.carrier,
         FIELD_NAMES.transport_mode,
         FIELD_NAMES.Valeu_invoice,
@@ -90,8 +94,12 @@ export async function createExcelManager(
         st: String(row[FIELD_NAMES.st]),
         supply: String(row[FIELD_NAMES.supply]),
         invoice_number: String(row[FIELD_NAMES.invoice_number]),
-        invoice_issue_date: parseExcelDate(row[FIELD_NAMES.invoice_issue_date]),
+        invoice_issue_date: parseDateStringToUTC(
+          row[FIELD_NAMES.invoice_issue_date],
+        ),
         destination: String(row[FIELD_NAMES.destination]).toUpperCase(),
+        city: String(row[FIELD_NAMES.city]).toUpperCase(),
+        uf: String(row[FIELD_NAMES.uf]).toUpperCase(),
         carrier: String(row[FIELD_NAMES.carrier]).toUpperCase(),
         transport_mode: String(row[FIELD_NAMES.transport_mode]).toUpperCase(),
         Valeu_invoice: Number(row[FIELD_NAMES.Valeu_invoice]),
@@ -101,32 +109,19 @@ export async function createExcelManager(
     });
   }
 
-  function parseExcelDate(dateCell: any): string {
-    if (!dateCell) return new Date().toISOString();
+  function parseDateStringToUTC(dateStr: string): string {
+    const [day, month, year] = dateStr.split('/').map(Number);
 
-    let jsDate: Date;
-
-    if (typeof dateCell === 'string') {
-      jsDate = new Date(dateCell);
-      if (isNaN(jsDate.getTime())) {
-        jsDate = new Date();
-      }
-    } else if (typeof dateCell === 'number') {
-      const excelDate = XLSX.SSF.parse_date_code(dateCell);
-      if (!excelDate || !excelDate.y) {
-        jsDate = new Date();
-      } else {
-        // Criar data sem horário específico para evitar problemas de fuso
-        jsDate = new Date(excelDate.y, excelDate.m - 1, excelDate.d);
-      }
-    } else {
-      jsDate = new Date();
+    if (!day || !month || !year) {
+      throw new Error(`Data inválida: ${dateStr}`);
     }
 
-    // OPÇÃO 1: Salvar apenas a data (meio-dia UTC para evitar problemas de fuso)
-    jsDate.setUTCHours(12, 0, 0, 0);
-    return jsDate.toISOString();
+    // Criar uma data em UTC, fixando o horário para 12:00
+    const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0, 0));
+
+    return utcDate.toISOString();
   }
+
   validateColumnsFromSheet(sheet);
 
   return transformToDto(dataJson);
