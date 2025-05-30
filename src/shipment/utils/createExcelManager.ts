@@ -90,6 +90,20 @@ export async function createExcelManager(
         );
       }
 
+      const allowedCategories = [
+        'CASA CLIENTE',
+        'REDE EXTERNA',
+        'FERREMENTAL',
+        'MARKETING',
+      ];
+      const categoryValue = String(row[FIELD_NAMES.category]).toUpperCase();
+
+      if (!allowedCategories.includes(categoryValue)) {
+        throw new BadRequestException(
+          `Linha ${index + 1} contém uma categoria inválida: "${categoryValue}". As categorias permitidas são: ${allowedCategories.join(', ')}.`,
+        );
+      }
+
       return {
         st: String(row[FIELD_NAMES.st]),
         supply: String(row[FIELD_NAMES.supply]),
@@ -103,23 +117,38 @@ export async function createExcelManager(
         carrier: String(row[FIELD_NAMES.carrier]).toUpperCase(),
         transport_mode: String(row[FIELD_NAMES.transport_mode]).toUpperCase(),
         Valeu_invoice: Number(row[FIELD_NAMES.Valeu_invoice]),
-        category: String(row[FIELD_NAMES.category]).toUpperCase(),
+        category: categoryValue,
         user_id: user,
       };
     });
   }
 
-  function parseDateStringToUTC(dateStr: string): string {
-    const [day, month, year] = dateStr.split('/').map(Number);
-
-    if (!day || !month || !year) {
-      throw new Error(`Data inválida: ${dateStr}`);
+  function parseDateStringToUTC(dateInput: any): string {
+    if (dateInput instanceof Date) {
+      return dateInput.toISOString();
     }
 
-    // Criar uma data em UTC, fixando o horário para 12:00
-    const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0, 0));
+    if (typeof dateInput === 'number') {
+      // Converte número serial do Excel para data
+      const excelEpoch = new Date(Date.UTC(1899, 11, 30)); // Data base do Excel
+      const utcDate = new Date(excelEpoch.getTime() + dateInput * 86400000);
+      return utcDate.toISOString();
+    }
 
-    return utcDate.toISOString();
+    if (typeof dateInput === 'string') {
+      const [day, month, year] = dateInput.split('/').map(Number);
+
+      if (!day || !month || !year) {
+        throw new Error(`Data inválida: ${dateInput}`);
+      }
+
+      const utcDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0, 0));
+      return utcDate.toISOString();
+    }
+
+    throw new Error(
+      `Formato de data não suportado: ${JSON.stringify(dateInput)}`,
+    );
   }
 
   validateColumnsFromSheet(sheet);
