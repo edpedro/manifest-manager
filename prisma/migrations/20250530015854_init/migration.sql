@@ -21,6 +21,8 @@ CREATE TABLE "shipment" (
     "supply" TEXT NOT NULL,
     "invoice_number" TEXT NOT NULL,
     "invoice_issue_date" TIMESTAMP(3) NOT NULL,
+    "city" TEXT NOT NULL,
+    "uf" TEXT NOT NULL,
     "destination" TEXT NOT NULL,
     "carrier" TEXT NOT NULL,
     "transport_mode" TEXT NOT NULL,
