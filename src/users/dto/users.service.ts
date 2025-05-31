@@ -136,7 +136,7 @@ export class UsersService {
 
     const token = generateResetToken(userEmailExist.id);
 
-    const resetLink = `https://manifest-react.vercel.app/reset-password?token=${token}`;
+    const resetLink = `https://www.expedix.com.br/reset-password?token=${token}`;
 
     await this.emailQueueService.addToQueue({
       to: data.email,
