@@ -15,6 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UpdatePasswordUserUseCase } from '../usecases/update-password.user.usecase';
 import { PasswordUserDto } from '../dto/emailPassword-user.dto';
 import { ResetPasswordUserDto } from '../dto/resetPassword-user.dto';
+import { UserDto } from '../dto/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -74,10 +75,25 @@ export class UsersService {
 
   async update(id: string, data: UpdateUserDto) {
     const userEmailExist = await this.listUserIdUseCase.execute(id);
+    const users = await this.listUserUseCase.execute();
 
     if (!userEmailExist) {
       throw new HttpException('Usuario não encontrado', HttpStatus.BAD_REQUEST);
     }
+
+    const removerUser: UserDto[] = users.filter((user) => user.id !== id);
+
+    removerUser.forEach((user) => {
+      if (user.email === data.email) {
+        throw new HttpException('Email já cadastrado', HttpStatus.BAD_REQUEST);
+      }
+      if (user.username === data.username) {
+        throw new HttpException(
+          'Usuario já cadastrado',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    });
 
     try {
       const dataToUpdate: any = {
