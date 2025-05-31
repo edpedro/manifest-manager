@@ -67,4 +67,9 @@ export class ShippingController {
   removeShipment(@Param('id') id: string, @Body() data: UpdateManifestDto) {
     return this.shippingService.removeManisfest(+id, data);
   }
+
+  @Delete('manifest/all/:id')
+  removeShipmentaLL(@Param('id') id: string) {
+    return this.shippingService.deleteAllManifest(+id);
+  }
 }

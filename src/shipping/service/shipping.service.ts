@@ -18,6 +18,7 @@ import { ListIdShipmentUseCase } from 'src/shipment/usecases/list-id-shipment.us
 import { UpdateStatusShippingUseCase } from '../usecases/update-status-shipping.usecase';
 import { UpdateExpeditionShippingUseCase } from '../usecases/update-expedition-shipping.usecase';
 import { FindCPFShippingUseCase } from '../usecases/find-cpf-shipping.usecase';
+import { DeleteAllManifestShippingUseCase } from '../usecases/delete-Allmanifest-shipping.usecase';
 
 @Injectable()
 export class ShippingService {
@@ -35,6 +36,7 @@ export class ShippingService {
     private readonly updateStatusShippingUseCase: UpdateStatusShippingUseCase,
     private readonly updateExpeditionShippingUseCase: UpdateExpeditionShippingUseCase,
     private readonly findCPFShippingUseCase: FindCPFShippingUseCase,
+    private readonly deleteAllManifestShippingUseCase: DeleteAllManifestShippingUseCase,
   ) {}
 
   async create(createShippingDto: CreateShippingDto, req: ReqUserDto) {
@@ -478,6 +480,75 @@ export class ShippingService {
       throw new HttpException(
         'Romaneio não atualziado',
         HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async deleteAllManifest(id: number) {
+    const shippingExists = await this.findIdShippingUseCase.execute(id);
+
+    if (!shippingExists) {
+      throw new HttpException(
+        'Romaneio não encontrado',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (shippingExists?.status === 'Expedido') {
+      throw new HttpException(
+        'Nota fiscal não pode ser deletada, Romaneio já foi expedido',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    function filterDispatched(shipments: ShipmentDto[]) {
+      const dispatched = shipments.filter((item) => item.status === 'Expedido');
+      const notDispatched = shipments.filter(
+        (item) => item.status !== 'Expedido',
+      );
+      return { dispatched, notDispatched };
+    }
+
+    const onlyShipments: any[] = shippingExists.shipmentShipping.map(
+      (item) => item.shipment,
+    );
+
+    const { dispatched, notDispatched } = filterDispatched(onlyShipments);
+
+    if (dispatched.length > 0) {
+      const dispatchedSupplies = dispatched
+        .map((item) => item.supply)
+        .join(', ');
+      throw new HttpException(
+        `Os seguintes fornecimentos já foram expedidos: ${dispatchedSupplies}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const idsShipment = notDispatched.map((item) => item.id);
+
+    const shippingAlreadyExists =
+      await this.listManifestShippingUseCase.execute(idsShipment);
+
+    if (shippingAlreadyExists.length > 0) {
+      if (shippingAlreadyExists[0].shipping.id !== id) {
+        const shipment = shippingAlreadyExists
+          .map((item) => item.shipment.supply)
+          .join(', ');
+        throw new HttpException(
+          `Os fornecimentos ${shipment} já constam no romaneio ${shippingAlreadyExists[0].shipping.id}`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    try {
+      return await this.deleteAllManifestShippingUseCase.execute(id);
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Erro ao criar romaneio',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateShippingDto } from '../dto/create-shipping.dto';
 import { UpdateShippingDto } from '../dto/update-shipping.dto';
 import { CreateManifestDto } from '../dto/create-manifest.dto';
+import { UpdateManifestDto } from '../dto/update-manifest.dto';
 
 @Injectable()
 export class ShippingRepository {
@@ -87,36 +88,37 @@ export class ShippingRepository {
     });
   }
 
-async updateShippingStatus(
-  id: number,
-  updateShippingDto: UpdateShippingDto,
-): Promise<any> {
-  return await this.prisma.$transaction(async (tx) => {
-    const result = await tx.shipping.update({
-      where: { id },
-      data: {
-        status: 'Expedido',
-        isConfirm: true,
-        dispatch_date: updateShippingDto.dispatch_date,
-        dispatch_time: updateShippingDto.dispatch_time,
-      },
-      include: {
-        shipmentShipping: {
-          include: {
-            shipment: true,
+  async updateShippingStatus(
+    id: number,
+    updateShippingDto: UpdateShippingDto,
+  ): Promise<any> {
+    return await this.prisma.$transaction(async (tx) => {
+      const result = await tx.shipping.update({
+        where: { id },
+        data: {
+          status: 'Expedido',
+          isConfirm: true,
+          dispatch_date: updateShippingDto.dispatch_date,
+          dispatch_time: updateShippingDto.dispatch_time,
+        },
+        include: {
+          shipmentShipping: {
+            include: {
+              shipment: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    await Promise.all(
-      result.shipmentShipping.map((item) => {
-        if (!item.shipment) {
-          console.warn('Shipment não encontrado para o item:', item);
-          return;
-        }
-        return tx.shipment.update({
-          where: { id: item.shipment.id },
+      const shipmentIds = result.shipmentShipping
+        .filter((item) => item.shipment)
+        .map((item) => item.shipment.id);
+
+      if (shipmentIds.length > 0) {
+        await tx.shipment.updateMany({
+          where: {
+            id: { in: shipmentIds },
+          },
           data: {
             name: result.name,
             transport: result.transport,
@@ -126,13 +128,11 @@ async updateShippingStatus(
             status: 'Expedido',
           },
         });
-      }),
-    );
+      }
 
-    return result;
-  });
-}
-
+      return result;
+    });
+  }
   async removeShipping(id: number): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
       const shipping = await prisma.shipping.findUnique({
@@ -185,49 +185,50 @@ async updateShippingStatus(
   async createManifest(data: CreateManifestDto): Promise<any> {
     const { shippingId, shipmentId } = data;
 
-    const result = await this.prisma.$transaction(async (prisma) => {
-      const createdRelations = await Promise.all(
-        shipmentId.map((id) =>
-          prisma.shipmentShipping.create({
-            data: {
-              shippingId,
-              shipmentId: id,
+    const result = await this.prisma.$transaction(
+      async (prisma) => {
+        const createdRelations = await prisma.shipmentShipping.createMany({
+          data: shipmentId.map((id) => ({
+            shippingId,
+            shipmentId: id,
+          })),
+          skipDuplicates: true,
+        });
+
+        await prisma.shipment.updateMany({
+          where: {
+            id: {
+              in: shipmentId,
             },
-          }),
-        ),
-      );
-
-      await prisma.shipment.updateMany({
-        where: {
-          id: {
-            in: shipmentId,
           },
-        },
-        data: {
-          status: 'Em romaneio',
-        },
-      });
+          data: {
+            status: 'Em romaneio',
+          },
+        });
 
-      await prisma.shipping.update({
-        where: {
-          id: shippingId,
-        },
-        data: {
-          statusEmail: '',
-          status: 'Conferência',
-        },
-      });
+        await prisma.shipping.update({
+          where: {
+            id: shippingId,
+          },
+          data: {
+            statusEmail: '',
+            status: 'Conferência',
+          },
+        });
 
-      return createdRelations;
-    });
+        return createdRelations;
+      },
+      {
+        timeout: 30000,
+      },
+    );
 
     return {
       message: 'Manifesto criado com sucesso',
-      count: result.length,
+      count: result.count,
       relations: result,
     };
   }
-
   async findByIdsShipmentShipping(id: number[]) {
     return await this.prisma.shipmentShipping.findMany({
       where: { shipmentId: { in: id } },
@@ -294,6 +295,64 @@ async updateShippingStatus(
 
     return {
       message: 'Shipment removido do romaneio com sucesso',
+    };
+  }
+
+  async deleteAllShipmentManifest(shippingId: number): Promise<any> {
+    const result = await this.prisma.$transaction(
+      async (prisma) => {
+        const relations = await prisma.shipmentShipping.findMany({
+          where: {
+            shippingId: shippingId,
+          },
+          select: {
+            shipmentId: true,
+          },
+        });
+
+        const shipmentIds = relations.map((r) => r.shipmentId);
+
+        const deletedRelations = await prisma.shipmentShipping.deleteMany({
+          where: {
+            shippingId: shippingId,
+          },
+        });
+
+        if (shipmentIds.length > 0) {
+          await prisma.shipment.updateMany({
+            where: {
+              id: {
+                in: shipmentIds,
+              },
+            },
+            data: {
+              status: 'Pendente',
+            },
+          });
+        }
+
+        await prisma.shipping.update({
+          where: {
+            id: shippingId,
+          },
+          data: {
+            statusEmail: '',
+            status: 'Pendente',
+          },
+        });
+
+        return { deletedRelations, shipmentIds };
+      },
+      {
+        timeout: 30000,
+      },
+    );
+
+    return {
+      message: 'Manifesto deletado com sucesso',
+      count: result.deletedRelations.count,
+      affectedShipments: result.shipmentIds.length,
+      shipmentIds: result.shipmentIds,
     };
   }
 }
