@@ -34,8 +34,8 @@ export async function createExcelManager(
   }
 
   function validateColumnsFromSheet(sheet: XLSX.WorkSheet) {
-    const range = XLSX.utils.decode_range(sheet['!ref'] || ''); // Ex: A1:I3
-    const firstRow = range.s.r; // linha inicial (normalmente 0)
+    const range = XLSX.utils.decode_range(sheet['!ref'] || '');
+    const firstRow = range.s.r;
     const expectedHeaders = Object.values(FIELD_NAMES).map((v) => v.trim());
 
     const headersFromSheet: string[] = [];
@@ -63,19 +63,7 @@ export async function createExcelManager(
 
   function transformToDto(data: Record<string, any>[]): CreateShipmentDto[] {
     return data.map((row, index) => {
-      const requiredFields = [
-        FIELD_NAMES.st,
-        FIELD_NAMES.supply,
-        FIELD_NAMES.invoice_number,
-        FIELD_NAMES.invoice_issue_date,
-        FIELD_NAMES.destination,
-        FIELD_NAMES.city,
-        FIELD_NAMES.uf,
-        FIELD_NAMES.carrier,
-        FIELD_NAMES.transport_mode,
-        FIELD_NAMES.Valeu_invoice,
-        FIELD_NAMES.category,
-      ];
+      const requiredFields = Object.values(FIELD_NAMES);
 
       const missingFields = requiredFields.filter((field) => {
         const value = row[field];
@@ -90,17 +78,36 @@ export async function createExcelManager(
         );
       }
 
+      // --- Categoria
       const allowedCategories = [
         'CASA CLIENTE',
         'REDE EXTERNA',
-        'FERREMENTAL',
+        'FERRAMENTAL',
         'MARKETING',
+        'ENGENHARIA',
       ];
       const categoryValue = String(row[FIELD_NAMES.category]).toUpperCase();
 
       if (!allowedCategories.includes(categoryValue)) {
         throw new BadRequestException(
           `Linha ${index + 1} contém uma categoria inválida: "${categoryValue}". As categorias permitidas são: ${allowedCategories.join(', ')}.`,
+        );
+      }
+
+      // --- Modal (Transport Mode)
+      let transportModeRaw = String(row[FIELD_NAMES.transport_mode])
+        .toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+      let transportModeFormatted = '';
+
+      if (transportModeRaw === 'AEREO') {
+        transportModeFormatted = 'AÉREO';
+      } else if (transportModeRaw === 'RODOVIARIO') {
+        transportModeFormatted = 'RODOVIÁRIO';
+      } else {
+        throw new BadRequestException(
+          `Linha ${index + 1} contém um modal inválido: "${row[FIELD_NAMES.transport_mode]}". Os valores permitidos são: AÉREO, RODOVIÁRIO.`,
         );
       }
 
@@ -115,7 +122,7 @@ export async function createExcelManager(
         city: String(row[FIELD_NAMES.city]).toUpperCase(),
         uf: String(row[FIELD_NAMES.uf]).toUpperCase(),
         carrier: String(row[FIELD_NAMES.carrier]).toUpperCase(),
-        transport_mode: String(row[FIELD_NAMES.transport_mode]).toUpperCase(),
+        transport_mode: transportModeFormatted,
         Valeu_invoice: Number(row[FIELD_NAMES.Valeu_invoice]),
         category: categoryValue,
         user_id: user,
@@ -129,8 +136,7 @@ export async function createExcelManager(
     }
 
     if (typeof dateInput === 'number') {
-      // Converte número serial do Excel para data
-      const excelEpoch = new Date(Date.UTC(1899, 11, 30)); // Data base do Excel
+      const excelEpoch = new Date(Date.UTC(1899, 11, 30));
       const utcDate = new Date(excelEpoch.getTime() + dateInput * 86400000);
       return utcDate.toISOString();
     }

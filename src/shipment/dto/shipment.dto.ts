@@ -5,6 +5,8 @@ export class ShipmentDto {
   invoice_number: string;
   invoice_issue_date: Date;
   destination: string;
+  city: string;
+  uf: string;
   carrier: string;
   transport_mode: string;
   Valeu_invoice: number | null;

@@ -132,6 +132,8 @@ export class ShipmentRepository {
       invoice_number: shipment.invoice_number,
       invoice_issue_date: shipment.invoice_issue_date,
       destination: shipment.destination,
+      city: shipment.city,
+      uf: shipment.uf,
       carrier: shipment.carrier,
       transport_mode: shipment.transport_mode,
       Valeu_invoice: shipment.Valeu_invoice
@@ -195,6 +197,8 @@ export class ShipmentRepository {
       invoice_number: shipment.invoice_number,
       invoice_issue_date: shipment.invoice_issue_date,
       destination: shipment.destination,
+      city: shipment.city,
+      uf: shipment.uf,
       carrier: shipment.carrier,
       transport_mode: shipment.transport_mode,
       Valeu_invoice: shipment.Valeu_invoice
@@ -332,6 +336,8 @@ export class ShipmentRepository {
         invoice_number: shipment.invoice_number,
         invoice_issue_date: shipment.invoice_issue_date,
         destination: shipment.destination,
+        city: shipment.city,
+        uf: shipment.uf,
         carrier: shipment.carrier,
         transport_mode: shipment.transport_mode,
         Valeu_invoice: shipment.Valeu_invoice
@@ -603,6 +609,8 @@ export class ShipmentRepository {
       invoice_number: shipment.invoice_number,
       invoice_issue_date: shipment.invoice_issue_date,
       destination: shipment.destination,
+      city: shipment.city,
+      uf: shipment.uf,
       carrier: shipment.carrier,
       transport_mode: shipment.transport_mode,
       Valeu_invoice: shipment.Valeu_invoice
@@ -670,6 +678,8 @@ export class ShipmentRepository {
       invoice_number: updateShipment.invoice_number,
       invoice_issue_date: updateShipment.invoice_issue_date,
       destination: updateShipment.destination,
+      city: updateShipment.city,
+      uf: updateShipment.uf,
       carrier: updateShipment.carrier,
       transport_mode: updateShipment.transport_mode,
       Valeu_invoice: updateShipment.Valeu_invoice
