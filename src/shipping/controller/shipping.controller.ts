@@ -16,6 +16,7 @@ import { ReqUserDto } from 'src/auth/dto/req-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateManifestDto } from '../dto/create-manifest.dto';
 import { UpdateManifestDto } from '../dto/update-manifest.dto';
+import { CreateInvoiceManifestDto } from '../dto/create-invoice-manifest.dto';
 
 @Controller('shipping')
 @UseGuards(AuthGuard('jwt'))
@@ -30,6 +31,14 @@ export class ShippingController {
   @Post('manifest')
   createManifest(@Body() data: CreateManifestDto, @Req() req: ReqUserDto) {
     return this.shippingService.createManifest(data, req);
+  }
+
+  @Post('manifest/invoice')
+  createManifestInvoice(
+    @Body() data: CreateInvoiceManifestDto,
+    @Req() req: ReqUserDto,
+  ) {
+    return this.shippingService.createManifestInvoices(data, req);
   }
 
   @Get()

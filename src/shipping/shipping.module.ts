@@ -19,6 +19,9 @@ import { UpdateStatusMailShippingUseCase } from './usecases/update-statusMail-sh
 import { UpdateExpeditionShippingUseCase } from './usecases/update-expedition-shipping.usecase';
 import { FindCPFShippingUseCase } from './usecases/find-cpf-shipping.usecase';
 import { DeleteAllManifestShippingUseCase } from './usecases/delete-Allmanifest-shipping.usecase';
+import { SearchInvoiceUseCase } from 'src/shipment/usecases/invoice-search-shipment.usecase';
+import { SearchSupplyUseCase } from 'src/shipment/usecases/supply-search-shipment.usecase';
+import { SearchStUseCase } from 'src/shipment/usecases/st-search-shipment.usecase';
 
 @Module({
   controllers: [ShippingController],
@@ -42,6 +45,9 @@ import { DeleteAllManifestShippingUseCase } from './usecases/delete-Allmanifest-
     UpdateExpeditionShippingUseCase,
     FindCPFShippingUseCase,
     DeleteAllManifestShippingUseCase,
+    SearchSupplyUseCase,
+    SearchInvoiceUseCase,
+    SearchStUseCase,
   ],
 })
 export class ShippingModule {}

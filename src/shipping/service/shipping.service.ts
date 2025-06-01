@@ -19,6 +19,10 @@ import { UpdateStatusShippingUseCase } from '../usecases/update-status-shipping.
 import { UpdateExpeditionShippingUseCase } from '../usecases/update-expedition-shipping.usecase';
 import { FindCPFShippingUseCase } from '../usecases/find-cpf-shipping.usecase';
 import { DeleteAllManifestShippingUseCase } from '../usecases/delete-Allmanifest-shipping.usecase';
+import { SearchStUseCase } from 'src/shipment/usecases/st-search-shipment.usecase';
+import { SearchInvoiceUseCase } from 'src/shipment/usecases/invoice-search-shipment.usecase';
+import { SearchSupplyUseCase } from 'src/shipment/usecases/supply-search-shipment.usecase';
+import { CreateInvoiceManifestDto } from '../dto/create-invoice-manifest.dto';
 
 @Injectable()
 export class ShippingService {
@@ -37,6 +41,9 @@ export class ShippingService {
     private readonly updateExpeditionShippingUseCase: UpdateExpeditionShippingUseCase,
     private readonly findCPFShippingUseCase: FindCPFShippingUseCase,
     private readonly deleteAllManifestShippingUseCase: DeleteAllManifestShippingUseCase,
+    private readonly searchStUseCase: SearchStUseCase,
+    private readonly searchInvoiceUseCase: SearchInvoiceUseCase,
+    private readonly searchSupplyUseCase: SearchSupplyUseCase,
   ) {}
 
   async create(createShippingDto: CreateShippingDto, req: ReqUserDto) {
@@ -547,6 +554,94 @@ export class ShippingService {
 
     try {
       return await this.deleteAllManifestShippingUseCase.execute(id);
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Erro ao criar romaneio',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async createManifestInvoices(
+    data: CreateInvoiceManifestDto,
+    req: ReqUserDto,
+  ) {
+    const results = await Promise.all([
+      this.searchStUseCase.execute(data.search),
+      this.searchInvoiceUseCase.execute(data.search),
+      this.searchSupplyUseCase.execute(data.search),
+    ]);
+
+    if (!results.flat().length) {
+      throw new HttpException('Dados não encontrados', HttpStatus.BAD_REQUEST);
+    }
+
+    const shippingExists = await this.findIdShippingUseCase.execute(
+      data.shippingId,
+    );
+
+    if (!shippingExists) {
+      throw new HttpException(
+        'Romaneio não encontrado',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (shippingExists?.status === 'Expedido') {
+      throw new HttpException(
+        'Nota fiscal não pode ser incluida, Romaneio já foi expedido',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const idsInvoices = results.flat().map((invoice) => invoice.id);
+
+    const shipmentExists =
+      await this.listIdSShipmentUseCase.execute(idsInvoices);
+
+    function filterDispatched(shipments: ShipmentDto[]) {
+      const dispatched = shipments.filter((item) => item.status === 'Expedido');
+      const notDispatched = shipments.filter(
+        (item) => item.status !== 'Expedido',
+      );
+
+      return { dispatched, notDispatched };
+    }
+
+    const { dispatched, notDispatched } = filterDispatched(shipmentExists);
+
+    if (dispatched.length > 0) {
+      const dispatchedSupplies = dispatched
+        .map((item) => item.supply)
+        .join(', ');
+      throw new HttpException(
+        `Os seguintes fornecimentos já foram expedidos: ${dispatchedSupplies}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const idsShipment = notDispatched.map((item) => item.id);
+    const shippingAlreadyExists =
+      await this.listManifestShippingUseCase.execute(idsShipment);
+
+    if (shippingAlreadyExists.length > 0) {
+      const shipment = shippingAlreadyExists
+        .map((item) => item.shipment.supply)
+        .join(', ');
+      throw new HttpException(
+        `Os fornecimentos ${shipment} já constam no romaneio ${shippingAlreadyExists[0].shipping.id}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const newManifest: CreateManifestDto = {
+      shipmentId: idsShipment,
+      shippingId: data.shippingId,
+    };
+
+    try {
+      return await this.createManifestShippingUseCase.execute(newManifest);
     } catch (error) {
       console.error(error);
       throw new HttpException(
