@@ -1,58 +1,87 @@
-# Sistema Estoque WMS
+# 📢 Lançamento do Sistema ExpediX
 
-**Descrição:**
-Sistema de gerenciamento de estoque (WMS) desenvolvido para otimizar o controle de estoque, desde o cadastro de usuários até relatórios detalhados. Permite o acompanhamento de itens, movimentações e pedidos em um único ambiente centralizado.
-
----
-
-## 🚀 Funcionalidades Principais
-
-- **Cadastro de Usuário:** Gerencie os usuários que têm acesso ao sistema.
-- **Cadastro de Empresa:** Registre empresas que utilizam o sistema.
-- **Cadastro de Item:** Adicione e organize os itens disponíveis no estoque.
-- **Cadastro de Endereço:** Gerencie os endereços do estoque para uma logística eficiente.
-- **Recebimento de Nota Fiscal:** Registre e acompanhe o recebimento de mercadorias.
-- **Movimentação de Item:** Controle as entradas, saídas e transferências de itens no estoque.
-- **Pedido:** Gerencie pedidos de clientes e fornecedores.
-- **Estoque:** Monitore o saldo de itens e acompanhe atualizações em tempo real.
-- **Relatório:** Gere relatórios detalhados para análise e tomada de decisão.
-- **Consulta:** Pesquise rapidamente informações sobre itens, pedidos e movimentações.
+É com grande satisfação que anunciamos o lançamento do **ExpediX**, uma solução tecnológica moderna e robusta, desenvolvida para revolucionar o controle de expedição e o gerenciamento de notas fiscais, oferecendo mais eficiência, agilidade e transparência a toda a operação.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+--
 
-- **Backend:** NestJS
-- **Frontend:** ReactJS com Vite
-- **Mobile:** React Native
-- **Banco de Dados:** PostgreSQL
-- **Gerenciamento de Filas:** Bull com Redis
-- **Outros:**
-  - EasyPanel para gerenciamento da VPS
-  - Docker para containerização
+## ✅ Principais Benefícios
+
+- 🔍 **Consulta de Notas Fiscais e STs:**  
+  Verifique rapidamente se a coleta foi realizada — sem precisar consultar terceiros.
+
+- 📲 **Controle total na palma da mão:**  
+  Tenha autonomia para acompanhar e interagir com o processo de coleta.
+
+- 🕒 **Acompanhamento em tempo real:**  
+  Veja todas as movimentações acontecendo em tempo real.
+
+- 📦 **Romaneio Digital:**  
+  O motorista cria seu próprio romaneio informando:
+
+  - Nome
+  - CPF
+  - Placa
+  - Previsão de coleta
+  - Transportadora
+
+- 📊 **Relatórios personalizados:**  
+  Com filtros por:
+
+  - Nota ST
+  - Nota Fiscal
+  - Fornecimento
+  - Período
+  - Nome do motorista
+  - Placa
+  - CPF
+
+- 📌 **Indicadores e Dashboards Inteligentes:**  
+  Métricas visuais para uma gestão mais eficiente.
+
+- 🗂️ **Controle interno de expedição:**  
+  Visualize os materiais prontos para coleta.
 
 ---
 
-## 📂 Estrutura do Projeto
+## 🔜 Próximas Funcionalidades
 
-```plaintext
-.
-├── backend/           # Código do servidor NestJS
-├── frontend/          # Interface do usuário ReactJS
-├── mobile/            # Aplicativo React Native
-├── docs/              # Documentação detalhada do sistema
-└── README.md          # Documentação principal
-```
+- 📷 Upload de **foto do canhoto assinado**
+- 📸 Upload da **CNH do motorista**
 
 ---
 
-## 📜 Licença
+## 🧭 Guias de Utilização
 
-Este projeto está sob a licença [MIT](LICENSE). Sinta-se à vontade para usar e modificar conforme necessário.
+### 📝 Como Criar um Romaneio
+
+1. Acesse a opção **Romaneio**
+2. Clique no ícone **“+”** e preencha os dados do motorista
+3. Clique no ícone de **NFs** e adicione as notas através da busca por ST ou número da NF
+4. Após adicionar, clique no ícone de **enviar e-mail**  
+   ✅ O romaneio será criado e a equipe responsável notificada
+
+### 📤 Como Fazer Upload de Notas Fiscais
+
+1. Acesse a opção **Importar Pedidos**
+2. Clique em **Baixar Modelo** no canto superior
+3. Preencha **todos os campos obrigatórios** da planilha:
+   - ST
+   - Fornecimento
+   - Nota Fiscal
+   - Data de Emissão da NF
+   - Destino
+   - Transportadora
+   - Modal
+   - Valor
+   - Categoria
+4. Realize o **upload no sistema**  
+   ✅ As notas serão automaticamente cadastradas
 
 ---
 
-## 📞 Contato
+Em caso de dúvidas, sugestões ou suporte, entre em contato:
 
-- **Desenvolvedor:** Eduardo
-- **E-mail:** edp2013.ep@gmail.com
+**Desenvolvedor:** Eduardo  
+**E-mail:** edp2013.ep@gmail.com

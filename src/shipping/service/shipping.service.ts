@@ -129,7 +129,10 @@ export class ShippingService {
       return false;
     });
 
-    return data;
+    return {
+      data,
+      result,
+    };
   }
 
   async findOne(id: number, req: ReqUserDto) {
