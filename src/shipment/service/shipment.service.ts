@@ -128,7 +128,6 @@ export class ShipmentService {
 
   async findAllPendingShipping() {
     const result = await this.findAllPendingInShippingShipmentUseCase.execute();
-
     const now = new Date();
     const timeZone = 'America/Sao_Paulo';
 
@@ -153,22 +152,51 @@ export class ShipmentService {
         return date.toISOString().split('T')[0];
       }
 
+      // Função para calcular APENAS dias úteis (exclui sábados e domingos)
+      function calculateBusinessDays(startDate: Date, endDate: Date): number {
+        let businessDays = 0;
+        const current = new Date(startDate);
+
+        // Determina se o resultado deve ser negativo
+        const isNegative = endDate < startDate;
+        const [fromDate, toDate] = isNegative
+          ? [endDate, startDate]
+          : [startDate, endDate];
+
+        current.setTime(fromDate.getTime());
+
+        // Percorre cada dia entre as datas
+        while (current < toDate) {
+          const dayOfWeek = current.getDay();
+
+          // Conta APENAS se for dia útil (1=Segunda a 5=Sexta)
+          // 0=Domingo e 6=Sábado são IGNORADOS
+          if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+            businessDays++;
+          }
+
+          current.setDate(current.getDate() + 1);
+        }
+
+        return isNegative ? -businessDays : businessDays;
+      }
+
       const todayDate = parsePtBrDate(todayStr);
       const dispatchDateStr = getDateOnly(invoice.invoice_issue_date);
-
       const dispatchClean = new Date(dispatchDateStr);
 
-      const diffMs = dispatchClean.getTime() - todayDate.getTime();
+      // Calcula a diferença em dias úteis
+      const diffBusinessDays = calculateBusinessDays(todayDate, dispatchClean);
 
-      const diffDays = diffMs / (1000 * 60 * 60 * 24);
-
-      if (diffDays <= -3) {
+      // Aplica as cores baseado nos dias úteis
+      if (diffBusinessDays <= -3) {
         newPening.cor = 'red';
-      } else if (diffDays <= -2) {
+      } else if (diffBusinessDays <= -2) {
         newPening.cor = 'yellow';
       } else {
         newPening.cor = 'green';
       }
+
       return newPening;
     });
 
