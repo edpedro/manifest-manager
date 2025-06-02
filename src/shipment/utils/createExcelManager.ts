@@ -61,6 +61,34 @@ export async function createExcelManager(
     }
   }
 
+  function parseInvoiceValue(value: any): number {
+    if (typeof value === 'number') {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const numeric = value
+        .replace(/\s/g, '') // Remove espaços
+        .replace(/[^\d,.-]/g, '') // Remove R$, $, etc.
+        .replace(/\./g, '') // Remove separador de milhar
+        .replace(',', '.'); // Troca vírgula por ponto para decimais
+
+      const parsed = parseFloat(numeric);
+
+      if (isNaN(parsed)) {
+        throw new BadRequestException(
+          `Valor inválido no campo "Valor da NF": ${value}`,
+        );
+      }
+
+      return parsed;
+    }
+
+    throw new BadRequestException(
+      `Formato não suportado para o campo "Valor da NF": ${JSON.stringify(value)}`,
+    );
+  }
+
   function transformToDto(data: Record<string, any>[]): CreateShipmentDto[] {
     return data.map((row, index) => {
       const requiredFields = Object.values(FIELD_NAMES);
@@ -78,7 +106,6 @@ export async function createExcelManager(
         );
       }
 
-      // --- Categoria
       const allowedCategories = [
         'CASA CLIENTE',
         'REDE EXTERNA',
@@ -94,7 +121,6 @@ export async function createExcelManager(
         );
       }
 
-      // --- Modal (Transport Mode)
       let transportModeRaw = String(row[FIELD_NAMES.transport_mode])
         .toUpperCase()
         .normalize('NFD')
@@ -112,19 +138,19 @@ export async function createExcelManager(
       }
 
       return {
-        st: String(row[FIELD_NAMES.st]),
-        supply: String(row[FIELD_NAMES.supply]),
-        invoice_number: String(row[FIELD_NAMES.invoice_number]),
+        st: String(row[FIELD_NAMES.st]).trim(),
+        supply: String(row[FIELD_NAMES.supply]).trim(),
+        invoice_number: String(row[FIELD_NAMES.invoice_number]).trim(),
         invoice_issue_date: parseDateStringToUTC(
           row[FIELD_NAMES.invoice_issue_date],
-        ),
-        destination: String(row[FIELD_NAMES.destination]).toUpperCase(),
-        city: String(row[FIELD_NAMES.city]).toUpperCase(),
-        uf: String(row[FIELD_NAMES.uf]).toUpperCase(),
-        carrier: String(row[FIELD_NAMES.carrier]).toUpperCase(),
-        transport_mode: transportModeFormatted,
-        Valeu_invoice: Number(row[FIELD_NAMES.Valeu_invoice]),
-        category: categoryValue,
+        ).trim(),
+        destination: String(row[FIELD_NAMES.destination]).trim().toUpperCase(),
+        city: String(row[FIELD_NAMES.city]).trim().toUpperCase(),
+        uf: String(row[FIELD_NAMES.uf]).trim().toUpperCase(),
+        carrier: String(row[FIELD_NAMES.carrier]).trim().toUpperCase(),
+        transport_mode: transportModeFormatted.trim(),
+        Valeu_invoice: parseInvoiceValue(row[FIELD_NAMES.Valeu_invoice]),
+        category: categoryValue.trim(),
         user_id: user,
       };
     });
