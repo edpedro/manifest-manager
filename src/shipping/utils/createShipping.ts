@@ -22,6 +22,8 @@ interface ShippingData {
       invoice_number: string;
       invoice_issue_date: string | Date;
       destination: string;
+      city: string;
+      uf: string;
       carrier: string;
       transport_mode: string;
       category: string;
@@ -157,7 +159,7 @@ export async function generateRomaneioExcel(data: ShippingData) {
       shipment.supply,
       shipment.invoice_number,
       format(invoiceDate, 'dd/MM/yyyy', { locale: ptBR as Locale }),
-      shipment.destination.toUpperCase(),
+      shipment.city.toUpperCase(),
       data.transport.toUpperCase(),
     ]);
   }
