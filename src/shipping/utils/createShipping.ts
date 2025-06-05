@@ -112,6 +112,7 @@ export async function generateRomaneioExcel(data: ShippingData) {
 
   // Dados do transporte
   sheet.getCell('B6').value = 'MANIFESTO';
+  sheet.getCell('C6').value = `Nº ${data.id}`;
   sheet.getCell('F6').value = 'DATA';
   sheet.getCell('F7').value = 'Hora Expedição';
   sheet.getCell('G6').value = format(dispatchDate, 'dd/MM/yyyy', {

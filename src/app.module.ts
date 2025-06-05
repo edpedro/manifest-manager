@@ -14,7 +14,7 @@ import { join } from 'path';
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
-      serveRoot: '/public', // http://localhost:3000/public/logoiblgrupo.png
+      serveRoot: '/public',
     }),
     ConfigModule.forRoot(),
     UsersModule,
