@@ -7,9 +7,23 @@ import { ShipmentModule } from './shipment/shipment.module';
 import { ShippingModule } from './shipping/shipping.module';
 import { MailModule } from './mail/mail.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UsersModule, AuthModule, ShipmentModule, ShippingModule, MailModule, DashboardModule],
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public', // http://localhost:3000/public/logoiblgrupo.png
+    }),
+    ConfigModule.forRoot(),
+    UsersModule,
+    AuthModule,
+    ShipmentModule,
+    ShippingModule,
+    MailModule,
+    DashboardModule,
+  ],
   providers: [PrismaService],
   exports: [],
 })

@@ -1,7 +1,9 @@
 import * as ExcelJS from 'exceljs';
-import { Response } from 'express';
 import { format, Locale } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
+import * as path from 'path';
+import * as fs from 'fs';
+import { join } from 'path';
 
 type Decimal = any;
 
@@ -53,6 +55,23 @@ export async function generateRomaneioExcel(data: ShippingData) {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet('ROMANEIO');
 
+  const imagePath = join(
+    process.cwd(),
+    'src',
+    'shipping',
+    'assets',
+    'logoiblgrupo.png',
+  );
+  console.log(imagePath);
+  // Lê a imagem como Buffer
+  const imageBuffer = fs.readFileSync(imagePath);
+
+  // Adiciona a imagem ao workbook
+  const imageId = workbook.addImage({
+    buffer: imageBuffer,
+    extension: 'png',
+  });
+
   // Tamanho das colunas - Pula a primeira coluna e começa da segunda
   sheet.columns = [
     { width: 5 }, // Coluna A (menor, pois será pulada)
@@ -86,8 +105,10 @@ export async function generateRomaneioExcel(data: ShippingData) {
   };
 
   // Logo
-  // sheet.mergeCells('H3:J4');
-  // sheet.getCell('H3').value = 'IBL';
+  sheet.addImage(imageId, {
+    tl: { col: 5, row: 1 },
+    ext: { width: 150, height: 70 }, // tamanho da imagem em pixels
+  });
 
   // Dados do transporte
   sheet.getCell('B6').value = 'MANIFESTO';
@@ -100,6 +121,18 @@ export async function generateRomaneioExcel(data: ShippingData) {
   //   locale: ptBR as Locale,
   // });
 
+  function formatCPF(cpf: string): string {
+    // Remove tudo que não for número
+    const cleaned = cpf.replace(/\D/g, '');
+
+    // Aplica a máscara se tiver 11 dígitos
+    if (cleaned.length === 11) {
+      return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+
+    return cpf; // Retorna original se não tiver 11 dígitos
+  }
+
   sheet.getCell('B7').value = 'TRANSPORTE';
   sheet.getCell('C7').value = data.transport.toUpperCase() || '';
 
@@ -110,7 +143,7 @@ export async function generateRomaneioExcel(data: ShippingData) {
   sheet.getCell('C9').value = data.name.toUpperCase() || '';
 
   sheet.getCell('B10').value = 'CPF';
-  sheet.getCell('C10').value = data.cpf || '';
+  sheet.getCell('C10').value = formatCPF(data.cpf || '');
 
   sheet.getCell('B12').value = 'DEPOSITANTE';
   sheet.getCell('C12').value = 'TELEFÔNICA';
@@ -175,16 +208,16 @@ export async function generateRomaneioExcel(data: ShippingData) {
   const signatureRow = Math.max(46, footerRow);
 
   // Assinaturas
-  sheet.mergeCells(`B${signatureRow}:E${signatureRow}`);
+  sheet.mergeCells(`A${signatureRow}:D${signatureRow}`);
   sheet.getCell(`B${signatureRow}`).value =
-    'Assinatura Conferênte: ____________________________';
+    'Assinatura Conferênte: _________________________________________';
 
-  sheet.mergeCells(`F${signatureRow}:I${signatureRow}`);
-  sheet.getCell(`F${signatureRow}`).value =
-    'Assinatura Transportador: _____________________';
+  sheet.mergeCells(`E${signatureRow}:H${signatureRow}`);
+  sheet.getCell(`E${signatureRow}`).value =
+    'Assinatura Transportador: _____________________________________________';
 
   // Data da coleta duas linhas abaixo, centralizada
-  sheet.mergeCells(`C${signatureRow + 3}:F${signatureRow + 3}`);
+  sheet.mergeCells(`C${signatureRow + 3}:G${signatureRow + 3}`);
   sheet.getCell(`C${signatureRow + 3}`).value =
     `Data da Coleta:______/______/______`;
   sheet.getCell(`C${signatureRow + 3}`).alignment = { horizontal: 'center' };
