@@ -154,7 +154,7 @@ export class DashboardService {
       ],
       status: [...new Set(result.map((item) => item.status).filter(Boolean))],
     };
-    console.log(filterCardData);
+   
     return filterCardData;
   }
 }
