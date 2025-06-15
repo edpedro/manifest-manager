@@ -19,7 +19,7 @@ import {
   invoiceTransportValue,
   TransportValue,
 } from '../utils/invoiceTransportValue';
-import { shippingTime } from '../utils/shippingTime';
+import { shippingTime, TimeShipping } from '../utils/shippingTime';
 import { invoiceMediaDate } from '../utils/invoiceMediaDate';
 import { Modal, totalModal } from '../utils/totalModal';
 
@@ -35,10 +35,25 @@ type DashboardData = {
   top10InvoiceTransportTotal: Transport[];
   invoiceTotal3: number;
   top5InvoiceTransportValueTotal: TransportValue[];
-  timeShippinng: { hora: string; total: number }[];
+  timeShippinng: TimeShipping[];
   media: number;
   modalTotal: Modal[];
 };
+
+const meses = [
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
+];
 
 @Injectable()
 export class DashboardService {
@@ -46,6 +61,12 @@ export class DashboardService {
     private readonly findFilterDashboardUseCase: FindFilterDashboardUseCase,
   ) {}
   async getDashboardData(data: FilterDashboardDto): Promise<DashboardData> {
+    const mesAtual = meses[new Date().getMonth()];
+
+    if (data.month === '') {
+      data.month = mesAtual;
+    }
+    console.log(data.month);
     const result = await this.findFilterDashboardUseCase.execute(data);
 
     const { TotalSupply, TotalSt, SomaValeu, TotalExpedition } =
