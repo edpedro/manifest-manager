@@ -22,6 +22,7 @@ import {
 import { shippingTime, TimeShipping } from '../utils/shippingTime';
 import { invoiceMediaDate } from '../utils/invoiceMediaDate';
 import { Modal, totalModal } from '../utils/totalModal';
+import { totalDriver } from '../utils/totalDriver';
 
 type DashboardData = {
   TotalSupply: number;
@@ -38,6 +39,7 @@ type DashboardData = {
   timeShippinng: TimeShipping[];
   media: number;
   modalTotal: Modal[];
+  driver: number;
 };
 
 const meses = [
@@ -63,10 +65,12 @@ export class DashboardService {
   async getDashboardData(data: FilterDashboardDto): Promise<DashboardData> {
     const mesAtual = meses[new Date().getMonth()];
 
-    if (data.month === '') {
+    if (!data) {
+      data = { month: mesAtual };
+    } else if (!data.month || data.month.trim() === '') {
       data.month = mesAtual;
     }
-    console.log(data.month);
+
     const result = await this.findFilterDashboardUseCase.execute(data);
 
     const { TotalSupply, TotalSt, SomaValeu, TotalExpedition } =
@@ -93,6 +97,8 @@ export class DashboardService {
 
     const { modalTotal } = await totalModal(result);
 
+    const { driver } = await totalDriver(result);
+
     return {
       TotalSupply,
       TotalSt,
@@ -108,6 +114,7 @@ export class DashboardService {
       timeShippinng,
       media,
       modalTotal,
+      driver,
     };
   }
 }

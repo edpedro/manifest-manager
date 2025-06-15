@@ -663,7 +663,6 @@ export class ShipmentService {
         resultado[chave].count++;
       });
 
-      // Ordena por data (do mais antigo para o mais recente)
       return Object.values(resultado).sort((a, b) =>
         a.dataCompleta.localeCompare(b.dataCompleta),
       );
