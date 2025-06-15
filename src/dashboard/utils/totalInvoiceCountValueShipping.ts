@@ -15,7 +15,7 @@ export async function totalInvoiceCountValueShipping(data: ShipmentDto[]) {
       TotalSupply = TotalSupply + 1;
     }
     if (item.Valeu_invoice !== null) {
-      SomaValeu += item.Valeu_invoice;
+      SomaValeu += Number(item.Valeu_invoice);
     }
   });
 

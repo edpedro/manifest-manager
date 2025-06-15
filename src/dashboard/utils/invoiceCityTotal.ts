@@ -1,6 +1,6 @@
 import { ShipmentDto } from 'src/shipment/dto/shipment.dto';
 
-interface City {
+export interface City {
   name: string;
   total: number;
 }

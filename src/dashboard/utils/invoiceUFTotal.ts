@@ -1,6 +1,6 @@
 import { ShipmentDto } from 'src/shipment/dto/shipment.dto';
 
-interface UF {
+export interface UF {
   name: string;
   total: number;
 }

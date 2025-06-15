@@ -3,21 +3,49 @@ import { FilterDashboardDto } from '../dto/filter-dashboard.dto';
 import { UpdateDashboardDto } from '../dto/update-dashboard.dto';
 import { FindFilterDashboardUseCase } from '../usecases/find-filter-dashboard.usecase';
 import { totalInvoiceCountValueShipping } from '../utils/totalInvoiceCountValueShipping';
-import { invoiceDispatchedDate } from '../utils/invoiceDispatchedDate';
-import { totalCategory } from '../utils/totalCategory';
-import { invoiceUFTotal } from '../utils/invoiceUFTotal';
-import { invoiceCityTotal } from '../utils/invoiceCityTotal';
-import { invoiceTransportTotal } from '../utils/invoiceTransportTotal';
+import {
+  GroupedInvoiceData,
+  invoiceDispatchedDate,
+} from '../utils/invoiceDispatchedDate';
+import { Category, totalCategory } from '../utils/totalCategory';
+import { invoiceUFTotal, UF } from '../utils/invoiceUFTotal';
+import { City, invoiceCityTotal } from '../utils/invoiceCityTotal';
+import {
+  invoiceTransportTotal,
+  Transport,
+} from '../utils/invoiceTransportTotal';
 import { invoiceTotal3Days } from '../utils/invoiceTotal3Days';
-import { invoiceTransportValue } from '../utils/invoiceTransportValue';
+import {
+  invoiceTransportValue,
+  TransportValue,
+} from '../utils/invoiceTransportValue';
 import { shippingTime } from '../utils/shippingTime';
+import { invoiceMediaDate } from '../utils/invoiceMediaDate';
+import { Modal, totalModal } from '../utils/totalModal';
+
+type DashboardData = {
+  TotalSupply: number;
+  TotalSt: number;
+  SomaValeu: number;
+  TotalExpedition: number;
+  groupedInvoices: GroupedInvoiceData[];
+  categoryTotal: Category[];
+  top10InvoiceUfTotal: UF[];
+  top10InvoiceCityTotal: City[];
+  top10InvoiceTransportTotal: Transport[];
+  invoiceTotal3: number;
+  top5InvoiceTransportValueTotal: TransportValue[];
+  timeShippinng: { hora: string; total: number }[];
+  media: number;
+  modalTotal: Modal[];
+};
 
 @Injectable()
 export class DashboardService {
   constructor(
     private readonly findFilterDashboardUseCase: FindFilterDashboardUseCase,
   ) {}
-  async getDashboardData(data: FilterDashboardDto) {
+  async getDashboardData(data: FilterDashboardDto): Promise<DashboardData> {
     const result = await this.findFilterDashboardUseCase.execute(data);
 
     const { TotalSupply, TotalSt, SomaValeu, TotalExpedition } =
@@ -39,5 +67,26 @@ export class DashboardService {
       await invoiceTransportValue(result);
 
     const { timeShippinng } = await shippingTime(result);
+
+    const { media } = await invoiceMediaDate(result);
+
+    const { modalTotal } = await totalModal(result);
+
+    return {
+      TotalSupply,
+      TotalSt,
+      SomaValeu,
+      TotalExpedition,
+      groupedInvoices,
+      categoryTotal,
+      top10InvoiceUfTotal,
+      top10InvoiceCityTotal,
+      top10InvoiceTransportTotal,
+      invoiceTotal3,
+      top5InvoiceTransportValueTotal,
+      timeShippinng,
+      media,
+      modalTotal,
+    };
   }
 }

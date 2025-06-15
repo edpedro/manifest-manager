@@ -1,4 +1,4 @@
-interface TransportValue {
+export interface TransportValue {
   name: string;
   valeu: number;
 }

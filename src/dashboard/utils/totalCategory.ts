@@ -1,6 +1,6 @@
 import { ShipmentDto } from 'src/shipment/dto/shipment.dto';
 
-interface Category {
+export interface Category {
   name: string;
   total: number;
 }

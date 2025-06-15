@@ -1,6 +1,6 @@
 import { ShipmentDto } from 'src/shipment/dto/shipment.dto';
 
-interface Transport {
+export interface Transport {
   name: string;
   total: number;
 }

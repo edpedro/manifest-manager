@@ -1,6 +1,6 @@
 import { ShipmentDto } from 'src/shipment/dto/shipment.dto';
 
-interface GroupedInvoiceData {
+export interface GroupedInvoiceData {
   invoice_issue_date: string;
   invoice: number;
   dispatched: number;
