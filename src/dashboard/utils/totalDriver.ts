@@ -14,7 +14,7 @@ export async function totalDriver(data: ShipmentDto[]) {
       driver = driver + 1;
     }
   });
-  console.log(driver);
+
   return {
     driver,
   };

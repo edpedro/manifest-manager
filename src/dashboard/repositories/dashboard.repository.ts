@@ -26,13 +26,9 @@ export class DashboardRepository {
       const month = months[monthNew];
       if (!month) throw new Error('Mês inválido');
 
-      const dataMonthStart = new Date(year, month - 1, 1, 0, 0, 0);
+      const dataMonthStart = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
 
-      dataMonthStart.setHours(dataMonthStart.getHours() + 3);
-
-      const dataMonthEnd = new Date(year, month, 0, 23, 59, 59, 999);
-
-      dataMonthEnd.setHours(dataMonthEnd.getHours() + 3);
+      const dataMonthEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
 
       return { dataMonthStart, dataMonthEnd };
     }
@@ -41,17 +37,13 @@ export class DashboardRepository {
       dataString: string,
       finalDoDia = false,
     ): Date {
-      const data = new Date(dataString);
+      const [year, month, day] = dataString.split('-').map(Number);
 
       if (finalDoDia) {
-        data.setHours(23, 59, 59, 999);
+        return new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
       } else {
-        data.setHours(0, 0, 0, 0);
+        return new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
       }
-
-      data.setHours(data.getHours() + 3);
-
-      return data;
     }
 
     const intervaloMes = data.month
@@ -77,17 +69,18 @@ export class DashboardRepository {
     if (data.transport_mode_carrier)
       where.carrier = data.transport_mode_carrier;
     if (data.city) where.city = data.city;
+    if (data.uf) where.uf = data.uf;
     if (data.transportEnd) where.transport = data.transportEnd;
 
-    if (dataMonthStart && dataMonthEnd) {
-      where.invoice_issue_date = {
-        gte: dataMonthStart,
-        lte: dataMonthEnd,
-      };
-    } else if (date_start && date_end) {
+    if (date_start && date_end) {
       where.invoice_issue_date = {
         gte: date_start,
         lte: date_end,
+      };
+    } else if (dataMonthStart && dataMonthEnd) {
+      where.invoice_issue_date = {
+        gte: dataMonthStart,
+        lte: dataMonthEnd,
       };
     }
 

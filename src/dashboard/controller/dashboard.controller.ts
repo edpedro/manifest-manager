@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { DashboardService } from '../service/dashboard.service';
 import { FilterDashboardDto } from '../dto/filter-dashboard.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -11,5 +11,10 @@ export class DashboardController {
   @Post()
   dashboardData(@Body() filterDashboardDto: FilterDashboardDto) {
     return this.dashboardService.getDashboardData(filterDashboardDto);
+  }
+
+  @Get()
+  findFilterDash() {
+    return this.dashboardService.filterAllDashboard();
   }
 }

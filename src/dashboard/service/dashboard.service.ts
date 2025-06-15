@@ -23,6 +23,10 @@ import { shippingTime, TimeShipping } from '../utils/shippingTime';
 import { invoiceMediaDate } from '../utils/invoiceMediaDate';
 import { Modal, totalModal } from '../utils/totalModal';
 import { totalDriver } from '../utils/totalDriver';
+import { ListAllShipmentUseCase } from 'src/shipment/usecases/list-all-shipment.usecase';
+
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 type DashboardData = {
   TotalSupply: number;
@@ -61,6 +65,7 @@ const meses = [
 export class DashboardService {
   constructor(
     private readonly findFilterDashboardUseCase: FindFilterDashboardUseCase,
+    private readonly listAllShipmentUseCase: ListAllShipmentUseCase,
   ) {}
   async getDashboardData(data: FilterDashboardDto): Promise<DashboardData> {
     const mesAtual = meses[new Date().getMonth()];
@@ -116,5 +121,40 @@ export class DashboardService {
       modalTotal,
       driver,
     };
+  }
+
+  async filterAllDashboard() {
+    const result = await this.listAllShipmentUseCase.execute();
+
+    const filterCardData = {
+      month: [
+        ...new Set(
+          result
+            .map((item) => item.invoice_issue_date)
+            .filter((date) => !!date)
+            .map(
+              (date) =>
+                new Date(date)
+                  .toLocaleString('pt-BR', { month: 'long' })
+                  .replace(/^./, (c) => c.toUpperCase()), // primeira letra maiúscula
+            ),
+        ),
+      ],
+      city: [...new Set(result.map((item) => item.city).filter(Boolean))],
+      uf: [...new Set(result.map((item) => item.uf).filter(Boolean))],
+      carrier: [...new Set(result.map((item) => item.carrier).filter(Boolean))],
+      transport_mode: [
+        ...new Set(result.map((item) => item.transport_mode).filter(Boolean)),
+      ],
+      category: [
+        ...new Set(result.map((item) => item.category).filter(Boolean)),
+      ],
+      transport: [
+        ...new Set(result.map((item) => item.transport).filter(Boolean)),
+      ],
+      status: [...new Set(result.map((item) => item.status).filter(Boolean))],
+    };
+    console.log(filterCardData);
+    return filterCardData;
   }
 }

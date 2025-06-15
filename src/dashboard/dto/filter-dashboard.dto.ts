@@ -5,6 +5,7 @@ export class FilterDashboardDto {
   transport_mode?: string;
   transport_mode_carrier?: string;
   city?: string;
+  uf?: string;
   transportEnd?: string;
   dateStart?: string;
   dateEnd?: string;
