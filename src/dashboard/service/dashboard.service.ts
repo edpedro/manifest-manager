@@ -126,6 +126,16 @@ export class DashboardService {
   async filterAllDashboard() {
     const result = await this.listAllShipmentUseCase.execute();
 
+    // for (const i of result) {
+    //   if (i.transport) {
+    //     const possuiEspaco = /\s+$/.test(i.transport);
+    //     if (possuiEspaco) {
+    //       console.log(`"${i.transport}"`);
+    //       console.log('A string contém espaços.');
+    //     }
+    //   }
+    // }
+
     const filterCardData = {
       month: [
         ...new Set(
@@ -154,7 +164,7 @@ export class DashboardService {
       ],
       status: [...new Set(result.map((item) => item.status).filter(Boolean))],
     };
-   
+
     return filterCardData;
   }
 }

@@ -72,7 +72,10 @@ export class ShippingRepository {
       where: {
         id,
       },
-      data,
+      data: {
+        statusEmail: '',
+        ...data,
+      },
     });
   }
 
